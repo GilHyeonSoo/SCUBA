@@ -1,0 +1,16 @@
+{
+  "name": "scuba",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter mobile start",
+    "dev:web": "pnpm --filter mobile web",
+    "ios": "pnpm --filter mobile ios",
+    "android": "pnpm --filter mobile android",
+    "typecheck": "pnpm --filter mobile typecheck",
+    "lint": "pnpm --filter mobile lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "pnpm@11.24.0"
+}
