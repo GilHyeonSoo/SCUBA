@@ -57,7 +57,7 @@ export default function HomeScreen() {
       </FadeInView>
 
       <FadeInView index={2}>
-        <SectionHeader eyebrow="UPCOMING" title="다음 다이빙" action="일정 보기" compact />
+        <SectionHeader title="Upcoming" subtitle="다음 다이빙" action="일정 보기" compact />
         <View style={[styles.heroCard, shadows.lg]}>
           <LinearGradient
             colors={['#004E82', '#0077BF', '#3A9AD9']}
@@ -110,7 +110,7 @@ export default function HomeScreen() {
       </FadeInView>
 
       <FadeInView index={3}>
-        <SectionHeader eyebrow="BUDDY" title="주변 버디" />
+        <SectionHeader title="Buddy" subtitle="주변 버디" />
         {data.nearbyBuddies.map((buddy, buddyIndex) => (
           <AppCard
             key={buddy.id}
@@ -144,7 +144,7 @@ export default function HomeScreen() {
       </FadeInView>
 
       <FadeInView index={4}>
-        <SectionHeader eyebrow="GEAR" title="장비 점검" />
+        <SectionHeader title="Gear" subtitle="장비 점검" />
         {data.maintenance.map((item) => (
           <AppCard key={item.id} variant="soft" style={styles.card}>
             <View style={styles.cardTopRow}>
@@ -159,7 +159,7 @@ export default function HomeScreen() {
       </FadeInView>
 
       <FadeInView index={5}>
-        <SectionHeader eyebrow="LOG" title="최근 다이빙" action="로그 보기" />
+        <SectionHeader title="Log" subtitle="최근 다이빙" action="로그 보기" />
         <AppCard elevated style={styles.statsCard}>
           <AppText variant="h3">{data.recentDive.site}</AppText>
           <AppText variant="bodySmall">{data.recentDive.date}</AppText>
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   },
   adCarousel: {
     marginTop: 0,
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   greetingRow: {
     flexDirection: 'row',
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   cardSpacing: {
-    marginTop: spacing.md,
+    marginTop: spacing.lg,
   },
   cardTopRow: {
     flexDirection: 'row',

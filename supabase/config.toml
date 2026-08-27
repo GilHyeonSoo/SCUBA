@@ -1,0 +1,8 @@
+# A string used to distinguish different Supabase projects on the same host.
+project_id = "scuba"
+
+[api]
+enabled = true
+
+[functions.search-gear-products]
+verify_jwt = false

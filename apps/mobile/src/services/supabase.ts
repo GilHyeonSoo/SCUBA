@@ -2,7 +2,11 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
+function normalizeSupabaseUrl(url: string): string {
+  return url.replace(/\/rest\/v1\/?$/, '').replace(/\/$/, '');
+}
+
+const supabaseUrl = normalizeSupabaseUrl(process.env.EXPO_PUBLIC_SUPABASE_URL ?? '');
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 const ExpoSecureStoreAdapter = {
@@ -32,6 +36,21 @@ export const isSupabaseConfigured =
   supabaseUrl.length > 0 &&
   supabaseAnonKey.length > 0 &&
   !supabaseUrl.includes('your-project');
+
+export function getSupabaseProjectUrl(): string {
+  return supabaseUrl;
+}
+
+export function getSupabaseAnonKey(): string {
+  return supabaseAnonKey;
+}
+
+export function getSupabaseFunctionUrl(functionName: string): string | null {
+  if (!isSupabaseConfigured) {
+    return null;
+  }
+  return `${supabaseUrl}/functions/v1/${functionName}`;
+}
 
 let supabaseClient: SupabaseClient | null = null;
 

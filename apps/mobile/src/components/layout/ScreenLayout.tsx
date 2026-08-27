@@ -17,6 +17,8 @@ type ScreenLayoutProps = {
   contentTopSpacing?: number;
   /** Tab bar is hidden on stack screens such as buddy. */
   withTabBarInset?: boolean;
+  /** Disable outer scroll when the screen manages its own scroll container. */
+  scrollable?: boolean;
 };
 
 const TAB_BAR_ESTIMATE = Platform.OS === 'ios' ? 88 : 72;
@@ -27,6 +29,7 @@ export function ScreenLayout({
   contentContainerStyle,
   contentTopSpacing = spacing.xs,
   withTabBarInset = true,
+  scrollable = true,
 }: ScreenLayoutProps) {
   const insets = useSafeAreaInsets();
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -46,26 +49,32 @@ export function ScreenLayout({
     ? TAB_BAR_ESTIMATE + insets.bottom
     : insets.bottom + spacing.lg;
 
+  const contentStyle = [
+    scrollable ? styles.content : styles.flexContent,
+    {
+      paddingTop: topInset + contentTopSpacing,
+      paddingBottom: bottomInset + spacing.lg,
+    },
+    contentContainerStyle,
+  ];
+
   return (
     <View style={styles.container}>
       <CollapsibleChromeHeader headerHeight={headerHeight} onHeightChange={setHeaderHeight}>
         {header}
       </CollapsibleChromeHeader>
-      <Animated.ScrollView
-        ref={scrollRef}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.content,
-          {
-            paddingTop: topInset + contentTopSpacing,
-            paddingBottom: bottomInset + spacing.lg,
-          },
-          contentContainerStyle,
-        ]}>
-        {children}
-      </Animated.ScrollView>
+      {scrollable ? (
+        <Animated.ScrollView
+          ref={scrollRef}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={contentStyle}>
+          {children}
+        </Animated.ScrollView>
+      ) : (
+        <View style={contentStyle}>{children}</View>
+      )}
     </View>
   );
 }
@@ -76,6 +85,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
+    paddingHorizontal: layout.screenPaddingHorizontal,
+  },
+  flexContent: {
+    flex: 1,
     paddingHorizontal: layout.screenPaddingHorizontal,
   },
 });

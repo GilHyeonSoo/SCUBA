@@ -65,7 +65,7 @@ export default function MyScreen() {
       ) : null}
 
       <FadeInView index={2}>
-        <SectionHeader eyebrow="MY" title="메뉴" />
+        <SectionHeader title="My" subtitle="메뉴" />
         {menuItems.map((item, index) => (
           <AppCard
             key={item.id}

@@ -5,9 +5,10 @@ import { colors, spacing } from '@/src/constants';
 import { AppText } from './AppText';
 
 type SectionHeaderProps = {
+  /** 영문 메인 타이틀 */
   title: string;
-  /** Editorial 스타일 상단 라벨 (선택) */
-  eyebrow?: string;
+  /** 한글 서브 타이틀 */
+  subtitle?: string;
   action?: string;
   onActionPress?: () => void;
   compact?: boolean;
@@ -15,7 +16,7 @@ type SectionHeaderProps = {
 
 export function SectionHeader({
   title,
-  eyebrow,
+  subtitle,
   action,
   onActionPress,
   compact = false,
@@ -24,14 +25,14 @@ export function SectionHeader({
     <View style={[styles.container, compact && styles.compact]}>
       <View style={styles.headerRow}>
         <View style={styles.titleBlock}>
-          {eyebrow ? (
-            <AppText variant="caption" style={styles.eyebrow}>
-              {eyebrow}
-            </AppText>
-          ) : null}
-          <AppText variant="h2" style={styles.title}>
+          <AppText variant="h2" style={styles.mainTitle}>
             {title}
           </AppText>
+          {subtitle ? (
+            <AppText variant="caption" style={styles.subtitle}>
+              {subtitle}
+            </AppText>
+          ) : null}
         </View>
 
         {action ? (
@@ -55,8 +56,8 @@ export function SectionHeader({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.md,
+    marginTop: spacing.xl + spacing.xs,
+    marginBottom: spacing.lg,
     gap: spacing.md,
   },
   compact: {
@@ -70,20 +71,22 @@ const styles = StyleSheet.create({
   },
   titleBlock: {
     flex: 1,
-    gap: 2,
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
   },
-  eyebrow: {
-    fontSize: 11,
+  mainTitle: {
+    fontSize: 17,
     fontWeight: '600',
-    letterSpacing: 1.2,
-    color: colors.textTertiary,
-    textTransform: 'uppercase',
+    letterSpacing: -0.35,
+    lineHeight: 22,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    letterSpacing: -0.5,
-    lineHeight: 26,
+  subtitle: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '400',
   },
   action: {
     flexDirection: 'row',

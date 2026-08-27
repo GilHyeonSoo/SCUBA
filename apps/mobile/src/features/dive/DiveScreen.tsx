@@ -37,7 +37,7 @@ export default function DiveScreen() {
       </FadeInView>
 
       <FadeInView index={1}>
-        <SectionHeader eyebrow="DIVE" title="빠른 작업" />
+        <SectionHeader title="Dive" subtitle="빠른 작업" />
         {diveActions.map((action, actionIndex) => (
           <AppCard
             key={action.id}

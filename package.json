@@ -7,7 +7,8 @@
     "ios": "pnpm --filter mobile ios",
     "android": "pnpm --filter mobile android",
     "typecheck": "pnpm --filter mobile typecheck",
-    "lint": "pnpm --filter mobile lint"
+    "lint": "pnpm --filter mobile lint",
+    "deploy:gear-function": "supabase functions deploy search-gear-products --project-ref qynwqpbvxhtelqqeavwh --no-verify-jwt --use-api"
   },
   "devDependencies": {
     "turbo": "^2.5.4"
