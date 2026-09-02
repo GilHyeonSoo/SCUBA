@@ -109,7 +109,13 @@ export default function GearScreen() {
 
   return (
     <ScreenLayout
-      header={<AppHeader title="내 장비" subtitle="등록 장비와 정비 주기를 관리하세요" />}
+      header={
+        <AppHeader
+          title="내 장비"
+          subtitle="등록 장비와 정비 주기를 관리하세요"
+          onBack={router.canGoBack() ? () => router.back() : undefined}
+        />
+      }
       contentContainerStyle={styles.content}>
       <FadeInView index={0}>
         <AppButton

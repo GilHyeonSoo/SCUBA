@@ -10,12 +10,12 @@ import { useChromeScrollHandler } from '@/src/hooks/useChromeScrollHandler';
 import { useScrollChromeStore } from '@/src/stores/scroll-chrome-store';
 
 type ScreenLayoutProps = {
-  header: ReactNode;
+  header?: ReactNode;
   children: ReactNode;
   contentContainerStyle?: StyleProp<ViewStyle>;
   /** Extra space below the header. Use 0 on home for a tighter layout. */
   contentTopSpacing?: number;
-  /** Tab bar is hidden on stack screens such as buddy. */
+  /** Tab bar is hidden on explore tab only. */
   withTabBarInset?: boolean;
   /** Disable outer scroll when the screen manages its own scroll container. */
   scrollable?: boolean;
@@ -44,7 +44,11 @@ export function ScreenLayout({
     }, [resetChrome]),
   );
 
-  const topInset = headerHeight > 0 ? headerHeight : insets.top + 52;
+  const topInset = header
+    ? headerHeight > 0
+      ? headerHeight
+      : insets.top + 52
+    : insets.top + spacing.lg;
   const bottomInset = withTabBarInset
     ? TAB_BAR_ESTIMATE + insets.bottom
     : insets.bottom + spacing.lg;
@@ -60,9 +64,11 @@ export function ScreenLayout({
 
   return (
     <View style={styles.container}>
-      <CollapsibleChromeHeader headerHeight={headerHeight} onHeightChange={setHeaderHeight}>
-        {header}
-      </CollapsibleChromeHeader>
+      {header ? (
+        <CollapsibleChromeHeader headerHeight={headerHeight} onHeightChange={setHeaderHeight}>
+          {header}
+        </CollapsibleChromeHeader>
+      ) : null}
       {scrollable ? (
         <Animated.ScrollView
           ref={scrollRef}

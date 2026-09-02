@@ -50,11 +50,9 @@ export type HomeAdBanner = {
 };
 
 export const mockHomeData = {
-  greeting: '안녕하세요, 다이버님',
   region: '서울',
   country: '대한민국',
   locationLabel: '서울, 대한민국',
-  profileImageUrl: null as string | null,
   nextDive: {
     id: '1',
     title: '강릉 사천 포인트',

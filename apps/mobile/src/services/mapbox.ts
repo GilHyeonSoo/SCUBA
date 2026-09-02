@@ -2,4 +2,4 @@ export {
   getMapboxAccessToken,
   initializeMapbox,
   isMapboxConfigured,
-} from './mapbox.web';
+} from './mapbox.native';

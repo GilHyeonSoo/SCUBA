@@ -4,17 +4,22 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useDeviceLocation } from '@/src/hooks/useDeviceLocation';
-import { EXPLORE_SHEET_PEEK_RATIO } from '@/src/features/explore/constants';
+import {
+  getMapMyLocationButtonBottom,
+} from '@/src/features/explore/constants';
 import { ExploreBottomSheet } from '@/src/features/explore/components/ExploreBottomSheet';
+import { ExploreSearchBar } from '@/src/features/explore/components/ExploreSearchBar';
 import {
   exploreFilterCategories,
   exploreFilters,
   explorePlaces,
 } from '@/src/features/explore/mock-data';
+import { filterExplorePlaces } from '@/src/features/explore/utils';
 import { DEFAULT_MAP_CENTER, USER_LOCATION_ZOOM } from '@/src/features/map/constants';
 import { DiveMapView } from '@/src/features/map/components/DiveMapView';
 import { MapMyLocationButton } from '@/src/features/map/components/MapMyLocationButton';
 import type { DiveMapViewRef, MapCameraTarget, MapMarker } from '@/src/features/map/types';
+import { useScrollChromeStore } from '@/src/stores/scroll-chrome-store';
 
 const MY_LOCATION_CAMERA_DURATION = 800;
 
@@ -23,10 +28,12 @@ export default function ExploreScreen() {
   const mapRef = useRef<DiveMapViewRef>(null);
   const hasCenteredOnUser = useRef(false);
   const [selectedFilterIndex, setSelectedFilterIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const { location, refresh } = useDeviceLocation();
+  const resetChrome = useScrollChromeStore((s) => s.resetChrome);
 
   const screenHeight = Dimensions.get('window').height;
-  const myLocationBottom = screenHeight * EXPLORE_SHEET_PEEK_RATIO + spacingAbovePeek(insets.bottom);
+  const myLocationBottom = getMapMyLocationButtonBottom(screenHeight, insets.bottom);
 
   const userMapTarget = useMemo<MapCameraTarget | undefined>(() => {
     if (!location) {
@@ -49,6 +56,8 @@ export default function ExploreScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      resetChrome();
+
       if (!userMapTarget || hasCenteredOnUser.current) {
         return;
       }
@@ -57,16 +66,13 @@ export default function ExploreScreen() {
       requestAnimationFrame(() => {
         centerMapOnUser(userMapTarget, false);
       });
-    }, [centerMapOnUser, userMapTarget]),
+    }, [centerMapOnUser, resetChrome, userMapTarget]),
   );
 
   const filteredPlaces = useMemo(() => {
     const category = exploreFilterCategories[selectedFilterIndex];
-    if (category === 'all') {
-      return explorePlaces;
-    }
-    return explorePlaces.filter((place) => place.category === category);
-  }, [selectedFilterIndex]);
+    return filterExplorePlaces(explorePlaces, category, searchQuery);
+  }, [searchQuery, selectedFilterIndex]);
 
   const mapMarkers = useMemo<MapMarker[]>(() => {
     const placeMarkers: MapMarker[] = filteredPlaces.map((place) => ({
@@ -126,6 +132,13 @@ export default function ExploreScreen() {
         style={StyleSheet.absoluteFill}
       />
 
+      <ExploreSearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onClear={() => setSearchQuery('')}
+        topInset={insets.top}
+      />
+
       <MapMyLocationButton
         onPress={handleMyLocationPress}
         bottom={myLocationBottom}
@@ -136,13 +149,10 @@ export default function ExploreScreen() {
         filters={exploreFilters}
         selectedFilterIndex={selectedFilterIndex}
         onFilterChange={setSelectedFilterIndex}
+        searchQuery={searchQuery}
       />
     </View>
   );
-}
-
-function spacingAbovePeek(bottomInset: number) {
-  return Math.max(bottomInset, 8) + 16;
 }
 
 const styles = StyleSheet.create({

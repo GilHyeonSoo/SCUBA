@@ -25,7 +25,7 @@ const TAB_CONFIG: Record<string, TabConfig> = {
   explore: { label: '탐색', icon: 'compass-outline', activeIcon: 'compass' },
   dive: { label: '다이빙', icon: 'water-outline', activeIcon: 'water' },
   index: { label: '홈', icon: 'home', activeIcon: 'home', isCenter: true },
-  gear: { label: '내 장비', icon: 'construct-outline', activeIcon: 'construct' },
+  tour: { label: '모임', icon: 'people-outline', activeIcon: 'people' },
   my: { label: '마이', icon: 'person-outline', activeIcon: 'person' },
 };
 
@@ -120,15 +120,19 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
   const chromeVisible = useScrollChromeStore((s) => s.chromeVisible);
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(1);
+  const activeRouteName = state.routes[state.index]?.name;
+  const highlightRouteName = activeRouteName === 'buddy' ? 'index' : activeRouteName;
+  const showTabBar =
+    chromeVisible || activeRouteName === 'buddy' || activeRouteName === 'explore';
 
   useEffect(() => {
-    translateY.value = withTiming(chromeVisible ? 0 : 120, {
+    translateY.value = withTiming(showTabBar ? 0 : 120, {
       duration: animation.normal,
     });
-    opacity.value = withTiming(chromeVisible ? 1 : 0, {
+    opacity.value = withTiming(showTabBar ? 1 : 0, {
       duration: animation.fast,
     });
-  }, [chromeVisible, opacity, translateY]);
+  }, [showTabBar, opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -145,14 +149,14 @@ export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
   return (
     <Animated.View
       style={[styles.wrapper, animatedStyle]}
-      pointerEvents={chromeVisible ? 'auto' : 'none'}>
+      pointerEvents={showTabBar ? 'auto' : 'none'}>
       <View style={[styles.container, shadows.md, { paddingBottom: bottomPadding }]}>
         <View style={styles.tabRow}>
         {state.routes.map((route, index) => {
           const config = TAB_CONFIG[route.name];
           if (!config) return null;
 
-          const isFocused = state.index === index;
+          const isFocused = highlightRouteName === route.name;
           const { options } = descriptors[route.key];
 
           const onPress = () => {
@@ -196,7 +200,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 20,
+    zIndex: 50,
+    elevation: 50,
   },
   container: {
     backgroundColor: colors.tabBar,

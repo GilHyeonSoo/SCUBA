@@ -4,72 +4,71 @@ import { useRouter } from 'expo-router';
 
 import { FadeInView } from '@/src/components/motion';
 import { ScreenLayout } from '@/src/components/layout/ScreenLayout';
-import { AppBadge, AppCard, AppHeader, AppText, SectionHeader } from '@/src/components/ui';
+import { AppCard, AppText, SectionHeader } from '@/src/components/ui';
 import { colors, radius, spacing } from '@/src/constants';
-import { useAuthStore } from '@/src/stores/auth-store';
+import { DiverLevelBadge } from '@/src/features/profile/components/DiverLevelBadge';
+import { ProfileAvatar } from '@/src/features/profile/components/ProfileAvatar';
+import { useProfileStore } from '@/src/features/profile/stores/profile-store';
+import { getProfileLevelBadges } from '@/src/features/profile/utils';
 
 const menuItems = [
-  { id: 'profile', label: '다이버 프로필', icon: 'person-outline' as const },
-  { id: 'certs', label: '자격증', icon: 'ribbon-outline' as const },
-  { id: 'settings', label: '설정', icon: 'settings-outline' as const },
+  {
+    id: 'profile',
+    label: '다이버 프로필',
+    icon: 'person-outline' as const,
+    route: '/(tabs)/my/profile' as const,
+  },
+  {
+    id: 'gear',
+    label: '내 장비',
+    icon: 'construct-outline' as const,
+    route: '/(tabs)/my/gear' as const,
+  },
+  { id: 'certs', label: '자격증', icon: 'ribbon-outline' as const, route: null },
+  { id: 'settings', label: '설정', icon: 'settings-outline' as const, route: null },
 ];
 
 export default function MyScreen() {
   const router = useRouter();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const profile = useProfileStore((state) => state.profile);
+  const levelBadges = getProfileLevelBadges(profile);
 
   return (
-    <ScreenLayout
-      header={<AppHeader title="마이" subtitle="프로필, 자격증, 설정" />}
-      contentContainerStyle={styles.content}>
+    <ScreenLayout contentContainerStyle={styles.content}>
       <FadeInView index={0}>
-        <AppCard elevated style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Ionicons name="person" size={30} color={colors.primary} />
-          </View>
+        <AppCard
+          elevated
+          pressable
+          onPress={() => router.push('/(tabs)/my/profile')}
+          style={styles.profileCard}>
+          <ProfileAvatar imageUrl={profile.profileImageUrl} size={76} />
           <View style={styles.profileInfo}>
-            <AppText variant="h2">다이버</AppText>
-            <AppText variant="bodySmall">프로필을 완성하고 버디를 찾아보세요</AppText>
-            <AppBadge label="AOW · 0 dives" tone="primary" />
+            <View style={styles.nameRow}>
+              <AppText variant="h2" style={styles.name}>
+                {profile.displayName}
+              </AppText>
+              {levelBadges.map((badge) => (
+                <DiverLevelBadge key={badge.key} badge={badge} />
+              ))}
+            </View>
+            <AppText variant="bodySmall" style={styles.bio}>
+              {profile.bio}
+            </AppText>
+            <AppText variant="caption" style={styles.diveCount}>
+              {`${profile.totalDives} dives`}
+            </AppText>
           </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
         </AppCard>
       </FadeInView>
 
-      {!isAuthenticated ? (
-        <FadeInView index={1}>
-          <AppCard variant="soft" style={styles.authCard}>
-            <AppText variant="h3">로그인이 필요합니다</AppText>
-            <AppText variant="bodySmall">
-              다이빙 로그, 장비 관리, 버디 매칭을 이용하려면 로그인하세요.
-            </AppText>
-            <View style={styles.authLinks}>
-              <AppText
-                variant="label"
-                color="primary"
-                onPress={() => router.push('/(auth)/login')}>
-                로그인
-              </AppText>
-              <AppText variant="caption">·</AppText>
-              <AppText
-                variant="label"
-                color="primary"
-                onPress={() => router.push('/(auth)/signup')}>
-                회원가입
-              </AppText>
-            </View>
-            <AppText variant="caption" style={styles.authProviders}>
-              카카오 · 네이버 · Apple · Google · 이메일
-            </AppText>
-          </AppCard>
-        </FadeInView>
-      ) : null}
-
-      <FadeInView index={2}>
+      <FadeInView index={1}>
         <SectionHeader title="My" subtitle="메뉴" />
         {menuItems.map((item, index) => (
           <AppCard
             key={item.id}
             pressable
+            onPress={item.route ? () => router.push(item.route) : undefined}
             style={[styles.menuItem, index > 0 && styles.menuSpacing]}>
             <View style={styles.menuRow}>
               <View style={styles.menuIcon}>
@@ -96,34 +95,25 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     alignItems: 'center',
   },
-  avatar: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: colors.primaryMuted,
-  },
   profileInfo: {
     flex: 1,
     gap: spacing.xs,
   },
-  authCard: {
-    gap: spacing.sm,
-    backgroundColor: colors.primarySoft,
-    borderColor: colors.primaryMuted,
-  },
-  authLinks: {
+  nameRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: spacing.sm,
-    marginTop: spacing.sm,
   },
-  authProviders: {
-    marginTop: spacing.xs,
+  name: {
+    flexShrink: 1,
+  },
+  bio: {
+    color: colors.textSecondary,
+  },
+  diveCount: {
     color: colors.textTertiary,
+    fontWeight: '600',
   },
   menuItem: {
     paddingVertical: spacing.md,

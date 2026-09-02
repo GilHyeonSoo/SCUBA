@@ -44,13 +44,33 @@ export type ExploreSheetOffsets = {
   full: number;
 };
 
-export function getExploreSheetOffsets(screenHeight: number): ExploreSheetOffsets {
-  const sheetHeight = screenHeight * EXPLORE_SHEET_HEIGHT_RATIO;
+export function getExploreSheetOffsets(
+  screenHeight: number,
+  bottomChrome = 0,
+  peekRatio = EXPLORE_SHEET_PEEK_RATIO,
+): ExploreSheetOffsets {
+  const mapAreaHeight = Math.max(screenHeight - bottomChrome, screenHeight * 0.55);
+  const sheetHeight = mapAreaHeight * EXPLORE_SHEET_HEIGHT_RATIO;
 
   return {
-    peek: sheetHeight - screenHeight * EXPLORE_SHEET_PEEK_RATIO,
-    half: sheetHeight - screenHeight * EXPLORE_SHEET_HALF_VISIBLE_RATIO,
-    full: sheetHeight - screenHeight * EXPLORE_SHEET_FULL_VISIBLE_RATIO,
+    peek: sheetHeight - mapAreaHeight * peekRatio,
+    half: sheetHeight - mapAreaHeight * EXPLORE_SHEET_HALF_VISIBLE_RATIO,
+    full: sheetHeight - mapAreaHeight * EXPLORE_SHEET_FULL_VISIBLE_RATIO,
+  };
+}
+
+export function getMapSheetMetrics(
+  screenHeight: number,
+  bottomChrome = 0,
+  peekRatio = EXPLORE_SHEET_PEEK_RATIO,
+) {
+  const mapAreaHeight = Math.max(screenHeight - bottomChrome, screenHeight * 0.55);
+  const sheetHeight = mapAreaHeight * EXPLORE_SHEET_HEIGHT_RATIO;
+
+  return {
+    mapAreaHeight,
+    sheetHeight,
+    offsets: getExploreSheetOffsets(screenHeight, bottomChrome, peekRatio),
   };
 }
 
@@ -74,4 +94,15 @@ export function getNearestSheetSnap(
   }
 
   return nearest;
+}
+
+/** 내 위치 버튼 bottom 오프셋 — 바텀시트 peek 높이 + 선택적 하단 크롬(탭바) */
+export function getMapMyLocationButtonBottom(
+  screenHeight: number,
+  bottomInset: number,
+  bottomChrome = 0,
+): number {
+  const spacingAbovePeek = Math.max(bottomInset, 8) + 16;
+
+  return bottomChrome + screenHeight * EXPLORE_SHEET_PEEK_RATIO + spacingAbovePeek;
 }

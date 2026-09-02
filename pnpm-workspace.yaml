@@ -1,5 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+minimumReleaseAgeExclude:
+  - expo-image-picker@57.0.15
 patchedDependencies:
   expo-modules-jsi@57.0.5: patches/expo-modules-jsi@57.0.5.patch

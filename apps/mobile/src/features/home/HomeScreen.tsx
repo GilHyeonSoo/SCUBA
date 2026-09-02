@@ -16,14 +16,18 @@ import {
 import { colors, radius, shadows, spacing } from '@/src/constants';
 import { HomeAdCarousel } from '@/src/features/home/components/HomeAdCarousel';
 import { mockHomeData } from '@/src/features/home/mock-data';
+import { useProfileStore } from '@/src/features/profile/stores/profile-store';
+import { formatProfileGreeting } from '@/src/features/profile/utils';
 
 const nextDiveHeroImage = require('@/assets/images/next-dive-turtle-crop.png');
 
 export default function HomeScreen() {
   const data = mockHomeData;
   const router = useRouter();
+  const profile = useProfileStore((state) => state.profile);
+  const greeting = formatProfileGreeting(profile.displayName);
 
-  const openBuddy = () => router.push('/buddy');
+  const openBuddy = () => router.push('/(tabs)/buddy');
 
   return (
     <ScreenLayout
@@ -33,14 +37,14 @@ export default function HomeScreen() {
         <View style={styles.greetingSection}>
           <View style={styles.greetingRow}>
             <View style={styles.avatar}>
-              {data.profileImageUrl ? (
-                <Image source={{ uri: data.profileImageUrl }} style={styles.avatarImage} />
+              {profile.profileImageUrl ? (
+                <Image source={{ uri: profile.profileImageUrl }} style={styles.avatarImage} />
               ) : (
                 <Ionicons name="person" size={28} color={colors.primary} />
               )}
             </View>
             <View style={styles.greetingTextBlock}>
-              <TypewriterText text={data.greeting} style={styles.greeting} />
+              <TypewriterText text={greeting} style={styles.greeting} />
               <View style={styles.locationRow}>
                 <FloatingMarker />
                 <AppText variant="caption" style={styles.locationText}>

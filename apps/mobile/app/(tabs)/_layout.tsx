@@ -20,12 +20,18 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: '탐색',
-          tabBarStyle: { display: 'none' },
         }}
       />
       <Tabs.Screen name="dive" options={{ title: '다이빙' }} />
       <Tabs.Screen name="index" options={{ title: '홈' }} />
-      <Tabs.Screen name="gear" options={{ title: '내 장비' }} />
+      <Tabs.Screen
+        name="buddy"
+        options={{
+          href: null,
+          title: '버디 찾기',
+        }}
+      />
+      <Tabs.Screen name="tour" options={{ title: '모임' }} />
       <Tabs.Screen name="my" options={{ title: '마이' }} />
     </Tabs>
   );
