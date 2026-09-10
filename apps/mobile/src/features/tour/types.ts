@@ -18,6 +18,7 @@ export type DiveMeeting = {
   category: MeetingCategory;
   environment: MeetingEnvironment;
   date: string;
+  endDate: string;
   time: string;
   location: string;
   cost: number | null;
@@ -35,6 +36,7 @@ export type MeetingDraft = {
   category: MeetingCategory;
   environment: MeetingEnvironment;
   date: string;
+  endDate: string;
   time: string;
   location: string;
   isFree: boolean;

@@ -20,7 +20,7 @@ import {
 import type { DiveMeeting } from '@/src/features/tour/types';
 import {
   formatMeetingCost,
-  formatMeetingDateCompact,
+  formatMeetingDateRangeCompact,
   formatMeetingParticipants,
 } from '@/src/features/tour/utils';
 
@@ -95,7 +95,7 @@ export function TourMeetingListItem({ meeting, onPress }: TourMeetingListItemPro
                 <View style={styles.infoRows}>
                   <InfoRow
                     label="일정"
-                    value={`${formatMeetingDateCompact(meeting.date)} ${meeting.time}`}
+                    value={`${formatMeetingDateRangeCompact(meeting.date, meeting.endDate)} ${meeting.time}`}
                   />
                   <InfoRow label="장소" value={meeting.location} />
                   <InfoRow label="환경" value={meetingEnvironmentLabels[meeting.environment]} />

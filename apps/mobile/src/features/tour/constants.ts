@@ -31,6 +31,31 @@ export const meetingPurposeOptions: Array<{ value: MeetingPurpose; label: string
   { value: 'photo', label: '사진/기록' },
 ];
 
+export const buddyPurposeOptions = meetingPurposeOptions.filter((option) =>
+  ['fun', 'practice', 'photo'].includes(option.value),
+);
+
+export const tourPurposeOptions = meetingPurposeOptions.filter((option) =>
+  ['tour', 'experience', 'fun'].includes(option.value),
+);
+
+export const educationPurposeOptions = meetingPurposeOptions.filter((option) =>
+  ['certification', 'practice', 'experience'].includes(option.value),
+);
+
+export function getMeetingPurposeOptions(category: MeetingCategory) {
+  switch (category) {
+    case 'buddy':
+      return buddyPurposeOptions;
+    case 'tour':
+      return tourPurposeOptions;
+    case 'education':
+      return educationPurposeOptions;
+    default:
+      return meetingPurposeOptions;
+  }
+}
+
 export const meetingPurposeLabels = Object.fromEntries(
   meetingPurposeOptions.map((option) => [option.value, option.label]),
 ) as Record<MeetingPurpose, string>;

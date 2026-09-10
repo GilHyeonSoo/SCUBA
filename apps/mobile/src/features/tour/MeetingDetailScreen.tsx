@@ -14,7 +14,7 @@ import {
 } from '@/src/features/tour/constants';
 import { MeetingCoverImage } from '@/src/features/tour/components/MeetingCoverImage';
 import { useMeetingStore } from '@/src/features/tour/stores/meeting-store';
-import { formatMeetingCost, formatMeetingDate, formatMeetingParticipants } from '@/src/features/tour/utils';
+import { formatMeetingCost, formatMeetingDateRange, formatMeetingParticipants } from '@/src/features/tour/utils';
 
 function DetailRow({
   icon,
@@ -108,7 +108,7 @@ export default function MeetingDetailScreen() {
       </AppCard>
 
       <AppCard elevated style={styles.detailCard}>
-        <DetailRow icon="calendar-outline" label="날짜" value={formatMeetingDate(meeting.date)} />
+        <DetailRow icon="calendar-outline" label="날짜" value={formatMeetingDateRange(meeting.date, meeting.endDate)} />
         <DetailRow icon="time-outline" label="시간" value={meeting.time} />
         <DetailRow icon="location-outline" label="장소" value={meeting.location} />
         <DetailRow icon="cash-outline" label="비용" value={formatMeetingCost(meeting.cost)} />

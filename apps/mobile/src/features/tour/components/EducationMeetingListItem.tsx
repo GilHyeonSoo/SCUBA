@@ -7,7 +7,7 @@ import { equipmentRentalLabels, meetingPurposeLabels } from '@/src/features/tour
 import type { DiveMeeting } from '@/src/features/tour/types';
 import {
   formatMeetingCost,
-  formatMeetingDateCompact,
+  formatMeetingDateRangeCompact,
   formatMeetingParticipants,
 } from '@/src/features/tour/utils';
 
@@ -45,7 +45,7 @@ export function EducationMeetingListItem({ meeting, onPress }: EducationMeetingL
         </AppText>
 
         <AppText variant="bodySmall" color="textSecondary">
-          {`${formatMeetingDateCompact(meeting.date)} ${meeting.time} · ${meeting.location}`}
+          {`${formatMeetingDateRangeCompact(meeting.date, meeting.endDate)} ${meeting.time} · ${meeting.location}`}
         </AppText>
 
         <View style={styles.detailRow}>

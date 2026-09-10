@@ -9,7 +9,7 @@ import { MeetingCoverImage } from '@/src/features/tour/components/MeetingCoverIm
 import type { DiveMeeting } from '@/src/features/tour/types';
 import {
   formatMeetingCost,
-  formatMeetingDate,
+  formatMeetingDateRange,
   formatMeetingParticipants,
 } from '@/src/features/tour/utils';
 
@@ -27,7 +27,7 @@ export function TourListItem({ meeting, onPress }: TourListItemProps) {
       <View style={styles.topSection}>
         <View style={styles.scheduleArea}>
           <AppText variant="caption" style={styles.date}>
-            {formatMeetingDate(meeting.date)}
+            {formatMeetingDateRange(meeting.date, meeting.endDate)}
           </AppText>
           <AppText variant="body" style={styles.time}>
             {meeting.time}
