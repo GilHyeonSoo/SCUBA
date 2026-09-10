@@ -17,3 +17,9 @@ export type DiverProfile = {
 export type DiverProfileDraft = Omit<DiverProfile, 'totalDives'> & {
   totalDives: string;
 };
+
+export type ProfileGalleryImage = {
+  id: string;
+  uri: string;
+  createdAt: number;
+};

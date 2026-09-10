@@ -5,14 +5,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CollapsibleChromeHeader } from '@/src/components/layout/CollapsibleChromeHeader';
 import { MapChromeOverlay } from '@/src/components/layout/MapChromeOverlay';
-import { colors, spacing } from '@/src/constants';
+import { colors, getTabBarChromeHeight, spacing } from '@/src/constants';
 import { DiveMapView } from '@/src/features/map/components/DiveMapView';
 import { MapMyLocationButton } from '@/src/features/map/components/MapMyLocationButton';
 import type { DiveMapViewRef, MapCameraTarget, MapMarker } from '@/src/features/map/types';
 import { useChromeMapInteraction } from '@/src/hooks/useChromeMapInteraction';
 import { useScrollChromeStore } from '@/src/stores/scroll-chrome-store';
 
-const TAB_BAR_ESTIMATE = Platform.OS === 'ios' ? 88 : 72;
 const MY_LOCATION_CAMERA_DURATION = 800;
 
 type MapScreenLayoutProps = {
@@ -43,7 +42,7 @@ export function MapScreenLayout({
   const resetChrome = useScrollChromeStore((s) => s.resetChrome);
   const { onMapMove, onMapMoveEnd } = useChromeMapInteraction();
 
-  const tabBarInset = withTabBarInset ? TAB_BAR_ESTIMATE + insets.bottom : insets.bottom;
+  const tabBarInset = withTabBarInset ? getTabBarChromeHeight(insets.bottom) : insets.bottom;
   const mapBottomInset = tabBarInset + spacing.md;
   const myLocationBottomVisible = withTabBarInset
     ? tabBarInset + spacing.lg

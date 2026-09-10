@@ -126,3 +126,69 @@ export function openProfileImagePicker({
     cancelable: true,
   });
 }
+
+const galleryPickerOptions: ImagePickerOptions = {
+  mediaTypes: ['images'],
+  allowsEditing: true,
+  aspect: [1, 1],
+  quality: 0.85,
+};
+
+export function openGalleryImagePicker(onSelect: (uri: string) => void) {
+  const options: AlertButton[] = [
+    {
+      text: '사진 보관함에서 선택',
+      onPress: async () => {
+        const uri = await withImagePicker(async (ImagePicker) => {
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert('권한 필요', '사진을 선택하려면 갤러리 접근 권한이 필요합니다.');
+            return null;
+          }
+
+          const result = await ImagePicker.launchImageLibraryAsync(galleryPickerOptions);
+          if (result.canceled || !result.assets[0]?.uri) {
+            return null;
+          }
+
+          return result.assets[0].uri;
+        });
+
+        if (uri) {
+          onSelect(uri);
+        }
+      },
+    },
+    {
+      text: '카메라로 촬영',
+      onPress: async () => {
+        const uri = await withImagePicker(async (ImagePicker) => {
+          const { status } = await ImagePicker.requestCameraPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert('권한 필요', '사진을 촬영하려면 카메라 접근 권한이 필요합니다.');
+            return null;
+          }
+
+          const result = await ImagePicker.launchCameraAsync(galleryPickerOptions);
+          if (result.canceled || !result.assets[0]?.uri) {
+            return null;
+          }
+
+          return result.assets[0].uri;
+        });
+
+        if (uri) {
+          onSelect(uri);
+        }
+      },
+    },
+    {
+      text: '취소',
+      style: 'cancel',
+    },
+  ];
+
+  Alert.alert('사진 추가', '프로필에 표시할 사진을 추가합니다.', options, {
+    cancelable: true,
+  });
+}

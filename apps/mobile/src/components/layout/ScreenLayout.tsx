@@ -1,11 +1,11 @@
 import { useFocusEffect } from 'expo-router';
 import { ReactNode, useCallback, useRef, useState } from 'react';
-import { Platform, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CollapsibleChromeHeader } from '@/src/components/layout/CollapsibleChromeHeader';
-import { colors, layout, spacing } from '@/src/constants';
+import { colors, getTabBarChromeHeight, layout, spacing } from '@/src/constants';
 import { useChromeScrollHandler } from '@/src/hooks/useChromeScrollHandler';
 import { useScrollChromeStore } from '@/src/stores/scroll-chrome-store';
 
@@ -19,9 +19,9 @@ type ScreenLayoutProps = {
   withTabBarInset?: boolean;
   /** Disable outer scroll when the screen manages its own scroll container. */
   scrollable?: boolean;
+  /** When scrollable, allow toggling scroll without swapping the container. */
+  scrollEnabled?: boolean;
 };
-
-const TAB_BAR_ESTIMATE = Platform.OS === 'ios' ? 88 : 72;
 
 export function ScreenLayout({
   header,
@@ -30,6 +30,7 @@ export function ScreenLayout({
   contentTopSpacing = spacing.xs,
   withTabBarInset = true,
   scrollable = true,
+  scrollEnabled = true,
 }: ScreenLayoutProps) {
   const insets = useSafeAreaInsets();
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -50,7 +51,7 @@ export function ScreenLayout({
       : insets.top + 52
     : insets.top + spacing.lg;
   const bottomInset = withTabBarInset
-    ? TAB_BAR_ESTIMATE + insets.bottom
+    ? getTabBarChromeHeight(insets.bottom)
     : insets.bottom + spacing.lg;
 
   const contentStyle = [
@@ -73,6 +74,7 @@ export function ScreenLayout({
         <Animated.ScrollView
           ref={scrollRef}
           onScroll={scrollHandler}
+          scrollEnabled={scrollEnabled}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={contentStyle}>

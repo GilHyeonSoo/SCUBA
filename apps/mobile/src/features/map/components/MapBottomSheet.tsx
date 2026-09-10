@@ -1,9 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useRef, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type ReactElement } from 'react';
 import {
   Dimensions,
   FlatList,
   PanResponder,
+  Pressable,
+  ScrollView,
   StyleSheet,
   View,
   type ListRenderItem,
@@ -21,6 +24,7 @@ import {
   exploreSheetEntranceBounce,
   EXPLORE_SHEET_HEIGHT_RATIO,
   exploreSheetEntranceSpring,
+  type ExploreSheetSnap,
   getExploreSheetOffsets,
   getNearestSheetSnap,
 } from '@/src/features/explore/constants';
@@ -28,6 +32,11 @@ import { MapFilterChips } from '@/src/features/map/components/MapFilterChips';
 
 type MapBottomSheetProps<T> = {
   title: string;
+  mode?: 'list' | 'detail';
+  onDetailBack?: () => void;
+  snapTarget?: ExploreSheetSnap;
+  snapKey?: string | null;
+  detailContent?: ReactElement;
   data: T[];
   keyExtractor: (item: T) => string;
   renderItem: ListRenderItem<T>;
@@ -44,6 +53,11 @@ type MapBottomSheetProps<T> = {
  */
 export function MapBottomSheet<T>({
   title,
+  mode = 'list',
+  onDetailBack,
+  snapTarget,
+  snapKey,
+  detailContent,
   data,
   keyExtractor,
   renderItem,
@@ -61,6 +75,21 @@ export function MapBottomSheet<T>({
 
   const translateY = useSharedValue(sheetOffsets.peek);
   const dragStartY = useRef(sheetOffsets.peek);
+
+  const snapTo = useCallback(
+    (target: ExploreSheetSnap) => {
+      translateY.value = withSpring(sheetOffsets[target], animation.spring);
+    },
+    [sheetOffsets, translateY],
+  );
+
+  useEffect(() => {
+    if (!snapTarget) {
+      return;
+    }
+
+    snapTo(snapTarget);
+  }, [snapKey, snapTarget, snapTo]);
 
   const playEntranceAnimation = useCallback(() => {
     const liftOffset =
@@ -81,9 +110,13 @@ export function MapBottomSheet<T>({
 
   useFocusEffect(
     useCallback(() => {
-      playEntranceAnimation();
-    }, [playEntranceAnimation]),
+      if (mode === 'list' && !snapTarget) {
+        playEntranceAnimation();
+      }
+    }, [mode, playEntranceAnimation, snapTarget]),
   );
+
+  const isDetailMode = mode === 'detail';
 
   const panResponder = useMemo(
     () =>
@@ -100,12 +133,12 @@ export function MapBottomSheet<T>({
           translateY.value = next;
         },
         onPanResponderRelease: (_, gesture) => {
-          const snapTo = getNearestSheetSnap(
+          const snapToOffset = getNearestSheetSnap(
             translateY.value,
             gesture.vy,
             sheetOffsets,
           );
-          translateY.value = withSpring(snapTo, animation.spring);
+          translateY.value = withSpring(snapToOffset, animation.spring);
         },
         onPanResponderTerminationRequest: () => false,
       }),
@@ -127,29 +160,52 @@ export function MapBottomSheet<T>({
       <View {...panResponder.panHandlers} style={styles.dragZone}>
         <View style={styles.handleArea}>
           <View style={styles.handle} />
-          <AppText variant="label" style={styles.peekTitle}>
-            {title}
-          </AppText>
+          {isDetailMode ? (
+            <View style={styles.detailHeader}>
+              <Pressable
+                accessibilityLabel="목록으로 돌아가기"
+                hitSlop={8}
+                onPress={onDetailBack}
+                style={styles.backButton}>
+                <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
+              </Pressable>
+            </View>
+          ) : (
+            <AppText variant="label" style={styles.peekTitle}>
+              {title}
+            </AppText>
+          )}
         </View>
       </View>
 
-      <View style={styles.filters}>
-        <MapFilterChips
-          filters={[...filters]}
-          selectedIndex={selectedFilterIndex}
-          onSelect={onFilterChange}
-        />
-      </View>
+      {!isDetailMode ? (
+        <View style={styles.filters}>
+          <MapFilterChips
+            filters={[...filters]}
+            selectedIndex={selectedFilterIndex}
+            onSelect={onFilterChange}
+          />
+        </View>
+      ) : null}
 
-      <FlatList
-        data={data}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        ListEmptyComponent={ListEmptyComponent}
-      />
+      {isDetailMode ? (
+        <ScrollView
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}>
+          {detailContent}
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          ListEmptyComponent={ListEmptyComponent}
+        />
+      )}
     </Animated.View>
   );
 }
@@ -183,6 +239,17 @@ const styles = StyleSheet.create({
   peekTitle: {
     color: colors.textPrimary,
     fontWeight: '600',
+  },
+  detailHeader: {
+    width: '100%',
+    alignItems: 'flex-start',
+    paddingHorizontal: layout.screenPaddingHorizontal,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   filters: {
     paddingBottom: spacing.sm,

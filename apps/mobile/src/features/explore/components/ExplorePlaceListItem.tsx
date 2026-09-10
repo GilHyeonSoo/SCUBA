@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/src/components/ui';
 import { colors, radius, spacing } from '@/src/constants';
-import type { ExplorePlace } from '@/src/features/explore/mock-data';
+import type { ExplorePlace } from '@/src/features/explore/types';
 
 const categoryIcons = {
   pool: 'water',
@@ -14,11 +14,12 @@ const categoryIcons = {
 
 type ExplorePlaceListItemProps = {
   place: ExplorePlace;
+  onPress?: () => void;
 };
 
-export function ExplorePlaceListItem({ place }: ExplorePlaceListItemProps) {
+export function ExplorePlaceListItem({ place, onPress }: ExplorePlaceListItemProps) {
   return (
-    <View style={styles.row}>
+    <Pressable onPress={onPress} style={styles.row}>
       <View style={styles.iconWrap}>
         <Ionicons name={categoryIcons[place.category]} size={18} color={colors.primary} />
       </View>
@@ -31,7 +32,7 @@ export function ExplorePlaceListItem({ place }: ExplorePlaceListItemProps) {
         </AppText>
       </View>
       <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-    </View>
+    </Pressable>
   );
 }
 

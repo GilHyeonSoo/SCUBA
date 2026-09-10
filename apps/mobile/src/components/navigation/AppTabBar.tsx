@@ -1,16 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { animation, colors, radius, shadows, spacing } from '@/src/constants';
-import { useScrollChromeStore } from '@/src/stores/scroll-chrome-store';
+import { TabBarGlassShell } from '@/src/components/navigation/TabBarGlassBackground';
+import { animation, colors, floatingTabBar, shadows, spacing } from '@/src/constants';
 
 type TabIconName = keyof typeof Ionicons.glyphMap;
 
@@ -18,13 +17,17 @@ type TabConfig = {
   label: string;
   icon: TabIconName;
   activeIcon: TabIconName;
-  isCenter?: boolean;
+};
+
+type TabLayout = {
+  x: number;
+  width: number;
 };
 
 const TAB_CONFIG: Record<string, TabConfig> = {
+  index: { label: '홈', icon: 'home-outline', activeIcon: 'home' },
   explore: { label: '탐색', icon: 'compass-outline', activeIcon: 'compass' },
   dive: { label: '다이빙', icon: 'water-outline', activeIcon: 'water' },
-  index: { label: '홈', icon: 'home', activeIcon: 'home', isCenter: true },
   tour: { label: '모임', icon: 'people-outline', activeIcon: 'people' },
   my: { label: '마이', icon: 'person-outline', activeIcon: 'person' },
 };
@@ -34,68 +37,31 @@ function TabItem({
   icon,
   activeIcon,
   isFocused,
-  isCenter,
   onPress,
   onLongPress,
+  onLayout,
 }: TabConfig & {
   isFocused: boolean;
   onPress: () => void;
   onLongPress: () => void;
+  onLayout: (event: LayoutChangeEvent) => void;
 }) {
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  if (isCenter) {
-    return (
-      <Pressable
-        accessibilityRole="button"
-        accessibilityState={isFocused ? { selected: true } : {}}
-        onPress={onPress}
-        onLongPress={onLongPress}
-        onPressIn={() => {
-          scale.value = withSpring(0.92, animation.spring);
-        }}
-        onPressOut={() => {
-          scale.value = withSpring(1, animation.spring);
-        }}
-        style={styles.centerTabWrap}>
-        <Animated.View style={[styles.centerButton, animatedStyle, shadows.lg]}>
-          <Ionicons name={isFocused ? activeIcon : icon} size={26} color={colors.white} />
-        </Animated.View>
-        <Animated.Text style={[styles.centerLabel, isFocused && styles.centerLabelActive]}>
-          {label}
-        </Animated.Text>
-      </Pressable>
-    );
-  }
-
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={isFocused ? { selected: true } : {}}
+      onLayout={onLayout}
       onPress={onPress}
       onLongPress={onLongPress}
-      onPressIn={() => {
-        scale.value = withSpring(0.9, animation.spring);
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, animation.spring);
-      }}
       style={styles.tabItem}>
-      <Animated.View style={[styles.iconWrap, animatedStyle]}>
+      <View style={styles.tabIndicator}>
         <Ionicons
           name={isFocused ? activeIcon : icon}
           size={22}
-          color={isFocused ? colors.primary : colors.textTertiary}
+          color={isFocused ? colors.primaryStrong : colors.textPrimary}
         />
-        {isFocused ? <View style={styles.activeDot} /> : null}
-      </Animated.View>
-      <Animated.Text style={[styles.label, isFocused && styles.labelActive]}>
-        {label}
-      </Animated.Text>
+        <Text style={[styles.label, isFocused && styles.labelActive]}>{label}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -117,80 +83,99 @@ type AppTabBarProps = {
 
 export function AppTabBar({ state, descriptors, navigation }: AppTabBarProps) {
   const insets = useSafeAreaInsets();
-  const chromeVisible = useScrollChromeStore((s) => s.chromeVisible);
-  const translateY = useSharedValue(0);
-  const opacity = useSharedValue(1);
-  const activeRouteName = state.routes[state.index]?.name;
-  const highlightRouteName = activeRouteName === 'buddy' ? 'index' : activeRouteName;
-  const showTabBar =
-    chromeVisible || activeRouteName === 'buddy' || activeRouteName === 'explore';
+  const bottomOffset = Math.max(insets.bottom, spacing.sm) + floatingTabBar.bottomGap;
+  const [tabLayouts, setTabLayouts] = useState<Record<string, TabLayout>>({});
+  const pillX = useSharedValue(0);
+  const pillWidth = useSharedValue(0);
+
+  const visibleRoutes = useMemo(
+    () => state.routes.filter((route) => TAB_CONFIG[route.name] != null),
+    [state.routes],
+  );
+  const focusedRouteName = state.routes[state.index]?.name ?? visibleRoutes[0]?.name;
+
+  const movePill = useCallback(
+    (layout: TabLayout) => {
+      pillX.value = withSpring(layout.x, animation.spring);
+      pillWidth.value = withSpring(layout.width, animation.spring);
+    },
+    [pillWidth, pillX],
+  );
 
   useEffect(() => {
-    translateY.value = withTiming(showTabBar ? 0 : 120, {
-      duration: animation.normal,
-    });
-    opacity.value = withTiming(showTabBar ? 1 : 0, {
-      duration: animation.fast,
-    });
-  }, [showTabBar, opacity, translateY]);
+    const layout = tabLayouts[focusedRouteName];
+    if (layout) {
+      movePill(layout);
+    }
+  }, [focusedRouteName, movePill, tabLayouts]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-    opacity: opacity.value,
+  const pillStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: pillX.value }],
+    width: pillWidth.value,
+    opacity: pillWidth.value > 0 ? 1 : 0,
   }));
 
-  const bottomPadding = Platform.select({
-    web: spacing.sm,
-    ios: Math.max(insets.bottom, spacing.sm),
-    android: Math.max(insets.bottom, spacing.sm),
-    default: spacing.sm,
-  });
+  const handleTabLayout = useCallback(
+    (routeName: string) => (event: LayoutChangeEvent) => {
+      const { x, width } = event.nativeEvent.layout;
+      setTabLayouts((previous) => ({ ...previous, [routeName]: { x, width } }));
+
+      if (routeName === focusedRouteName) {
+        movePill({ x, width });
+      }
+    },
+    [focusedRouteName, movePill],
+  );
 
   return (
-    <Animated.View
-      style={[styles.wrapper, animatedStyle]}
-      pointerEvents={showTabBar ? 'auto' : 'none'}>
-      <View style={[styles.container, shadows.md, { paddingBottom: bottomPadding }]}>
-        <View style={styles.tabRow}>
-        {state.routes.map((route, index) => {
-          const config = TAB_CONFIG[route.name];
-          if (!config) return null;
-
-          const isFocused = highlightRouteName === route.name;
-          const { options } = descriptors[route.key];
-
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name, route.params);
+    <View
+      pointerEvents="box-none"
+      style={[styles.wrapper, { bottom: bottomOffset, paddingHorizontal: floatingTabBar.horizontalInset }]}>
+      <TabBarGlassShell style={[styles.glassShell, shadows.lg]}>
+        <View style={styles.tabTrack}>
+          <Animated.View pointerEvents="none" style={[styles.selectionPill, pillStyle]} />
+          {visibleRoutes.map((route) => {
+            const config = TAB_CONFIG[route.name];
+            if (!config) {
+              return null;
             }
-          };
 
-          const onLongPress = () => {
-            navigation.emit({
-              type: 'tabLongPress',
-              target: route.key,
-            });
-          };
+            const isFocused = focusedRouteName === route.name;
+            const { options } = descriptors[route.key];
 
-          return (
-            <TabItem
-              key={route.key}
-              {...config}
-              label={options.title ?? config.label}
-              isFocused={isFocused}
-              onPress={onPress}
-              onLongPress={onLongPress}
-            />
-          );
-        })}
-      </View>
-      </View>
-    </Animated.View>
+            const onPress = () => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
+              });
+              if (!isFocused && !event.defaultPrevented) {
+                navigation.navigate(route.name, route.params);
+              }
+            };
+
+            const onLongPress = () => {
+              navigation.emit({
+                type: 'tabLongPress',
+                target: route.key,
+              });
+            };
+
+            return (
+              <TabItem
+                key={route.key}
+                {...config}
+                label={options.title ?? config.label}
+                isFocused={isFocused}
+                onLayout={handleTabLayout(route.name)}
+                onPress={onPress}
+                onLongPress={onLongPress}
+              />
+            );
+          })}
+        </View>
+      </TabBarGlassShell>
+    </View>
   );
 }
 
@@ -199,75 +184,49 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
     zIndex: 50,
     elevation: 50,
   },
-  container: {
-    backgroundColor: colors.tabBar,
-    borderTopWidth: 1,
-    borderTopColor: colors.tabBarBorder,
-    paddingTop: spacing.sm,
-    width: '100%',
+  glassShell: {
+    height: floatingTabBar.barHeight,
   },
-  tabRow: {
+  tabTrack: {
+    flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-around',
-    paddingHorizontal: spacing.sm,
+    alignItems: 'center',
+    position: 'relative',
+    paddingHorizontal: spacing.xs,
+  },
+  selectionPill: {
+    position: 'absolute',
+    top: spacing.xs,
+    bottom: spacing.xs,
+    borderRadius: 999,
+    backgroundColor: colors.primarySoft,
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
-    paddingTop: spacing.xs,
-    paddingBottom: spacing.xs,
+    justifyContent: 'center',
+    zIndex: 1,
   },
-  iconWrap: {
+  tabIndicator: {
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 28,
-  },
-  activeDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.primary,
-    marginTop: 4,
+    gap: 2,
+    minWidth: 52,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: 999,
   },
   label: {
     fontSize: 10,
     fontWeight: '500',
-    color: colors.textTertiary,
+    color: colors.textPrimary,
     letterSpacing: 0.1,
   },
   labelActive: {
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  centerTabWrap: {
-    flex: 1,
-    alignItems: 'center',
-    marginTop: -22,
-  },
-  centerButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    borderColor: colors.white,
-  },
-  centerLabel: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: colors.textTertiary,
-    marginTop: spacing.xs,
-  },
-  centerLabelActive: {
-    color: colors.primary,
+    color: colors.primaryStrong,
     fontWeight: '700',
   },
 });

@@ -1,27 +1,6 @@
-import type { MapMarkerTone } from '@/src/features/map/types';
+import type { ExplorePlace } from '@/src/features/explore/types';
 
-export type ExplorePlaceCategory = Exclude<MapMarkerTone, 'buddy'>;
-
-export type ExplorePlace = {
-  id: string;
-  name: string;
-  category: ExplorePlaceCategory;
-  categoryLabel: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-};
-
-export const exploreFilters = ['전체', '잠수풀', '포인트', '샵', '투어'] as const;
-
-export const exploreFilterCategories: Array<ExplorePlaceCategory | 'all'> = [
-  'all',
-  'pool',
-  'site',
-  'shop',
-  'tour',
-];
-
+/** Offline / Supabase 미설정 시 폴백 데이터 */
 export const explorePlaces: ExplorePlace[] = [
   {
     id: 'pool-1',
@@ -58,14 +37,5 @@ export const explorePlaces: ExplorePlace[] = [
     address: '서울 중구',
     latitude: 37.5512,
     longitude: 126.9882,
-  },
-  {
-    id: 'tour-1',
-    name: '제주 서귀포 투어',
-    category: 'tour',
-    categoryLabel: '투어',
-    address: '제주 서귀포시',
-    latitude: 33.2541,
-    longitude: 126.5601,
   },
 ];

@@ -1,4 +1,4 @@
-import type { ExplorePlace, ExplorePlaceCategory } from '@/src/features/explore/mock-data';
+import type { ExplorePlace, ExplorePlaceCategory } from '@/src/features/explore/types';
 
 export function filterExplorePlaces(
   places: ExplorePlace[],

@@ -1,3 +1,15 @@
+/** Explore 기본 반경 — 사용자 위치 중심 */
+export const EXPLORE_NEARBY_RADIUS_M = 3000;
+
+/** 약 3km 반경이 보이도록 맞춘 기본 줌 (일반 폰 폭 기준) */
+export const EXPLORE_DEFAULT_ZOOM = 13;
+
+/** 이보다 줌아웃되면 지도 영역(viewport) 기준으로 마커 표시 */
+export const EXPLORE_VIEWPORT_ZOOM_THRESHOLD = EXPLORE_DEFAULT_ZOOM - 0.35;
+
+/** 장소 상세 보기 시 지도 줌 */
+export const EXPLORE_PLACE_DETAIL_ZOOM = 14.5;
+
 export const EXPLORE_SHEET_PEEK_RATIO = 0.14;
 export const EXPLORE_SHEET_HALF_VISIBLE_RATIO = 0.5;
 export const EXPLORE_SHEET_FULL_VISIBLE_RATIO = 0.92;
@@ -78,9 +90,10 @@ export function getNearestSheetSnap(
   currentOffset: number,
   velocityY: number,
   offsets: ExploreSheetOffsets,
+  allowedSnaps: ExploreSheetSnap[] = ['peek', 'half', 'full'],
 ): number {
   const projected = currentOffset + velocityY * 40;
-  const snaps = [offsets.peek, offsets.half, offsets.full];
+  const snaps = allowedSnaps.map((snap) => offsets[snap]);
 
   let nearest = snaps[0];
   let nearestDistance = Math.abs(projected - snaps[0]);
@@ -94,6 +107,15 @@ export function getNearestSheetSnap(
   }
 
   return nearest;
+}
+
+/** 상세 패널 half 상태일 때 지도 카메라 하단 패딩 — 마커가 패널 위 영역 중앙에 오도록 */
+export function getExploreDetailMapBottomPadding(
+  screenHeight: number,
+  bottomChrome = 0,
+): number {
+  const { mapAreaHeight } = getMapSheetMetrics(screenHeight, bottomChrome);
+  return mapAreaHeight * EXPLORE_SHEET_HALF_VISIBLE_RATIO;
 }
 
 /** 내 위치 버튼 bottom 오프셋 — 바텀시트 peek 높이 + 선택적 하단 크롬(탭바) */

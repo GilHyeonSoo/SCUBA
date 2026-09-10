@@ -16,14 +16,11 @@ export default function TabLayout() {
         headerShown: false,
         lazy: true,
       }}>
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: '탐색',
-        }}
-      />
-      <Tabs.Screen name="dive" options={{ title: '다이빙' }} />
       <Tabs.Screen name="index" options={{ title: '홈' }} />
+      <Tabs.Screen name="explore" options={{ title: '탐색' }} />
+      <Tabs.Screen name="dive" options={{ title: '다이빙' }} />
+      <Tabs.Screen name="tour" options={{ title: '모임' }} />
+      <Tabs.Screen name="my" options={{ title: '마이' }} />
       <Tabs.Screen
         name="buddy"
         options={{
@@ -31,8 +28,6 @@ export default function TabLayout() {
           title: '버디 찾기',
         }}
       />
-      <Tabs.Screen name="tour" options={{ title: '모임' }} />
-      <Tabs.Screen name="my" options={{ title: '마이' }} />
     </Tabs>
   );
 }

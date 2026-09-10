@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter mobile start",
+    "dev:ios": "pnpm --filter mobile start:ios",
+    "dev:lan": "pnpm --filter mobile start:lan",
     "dev:web": "pnpm --filter mobile web",
     "ios": "pnpm --filter mobile ios",
     "android": "pnpm --filter mobile android",

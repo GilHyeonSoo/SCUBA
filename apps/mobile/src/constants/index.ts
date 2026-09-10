@@ -1,6 +1,6 @@
 export { colors, gradients } from './colors';
 export { spacing, radius, layout } from './spacing';
-export { getTabBarChromeHeight } from './tab-bar';
+export { floatingTabBar, getTabBarChromeHeight } from './tab-bar';
 export { typography } from './typography';
 export { animation } from './animation';
 export { shadows } from './shadows';

@@ -1,100 +1,76 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { FadeInView } from '@/src/components/motion';
 import { ScreenLayout } from '@/src/components/layout/ScreenLayout';
-import {
-  AppButton,
-  AppCard,
-  AppChip,
-  AppText,
-  SectionHeader,
-} from '@/src/components/ui';
+import { AppCard, AppText } from '@/src/components/ui';
 import { spacing } from '@/src/constants';
+import { MeetingCategoryContent } from '@/src/features/tour/components/MeetingCategoryContent';
+import { MeetingCategoryTabs } from '@/src/features/tour/components/MeetingCategoryTabs';
+import { MeetingRecruitFab } from '@/src/features/tour/components/MeetingRecruitFab';
 import { TourListItem } from '@/src/features/tour/components/TourListItem';
-import { meetingCategoryFilters } from '@/src/features/tour/constants';
+import { meetingCategoryLabels } from '@/src/features/tour/constants';
 import { useMeetingStore } from '@/src/features/tour/stores/meeting-store';
+import type { MeetingCategory } from '@/src/features/tour/types';
 import { filterMeetings } from '@/src/features/tour/utils';
 
 export default function TourScreen() {
   const router = useRouter();
   const meetings = useMeetingStore((state) => state.meetings);
-  const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<MeetingCategory>('buddy');
 
   const filteredMeetings = useMemo(
-    () => filterMeetings(meetings, selectedCategoryIndex),
-    [meetings, selectedCategoryIndex],
+    () => filterMeetings(meetings, selectedCategory),
+    [meetings, selectedCategory],
   );
 
+  const categoryLabel = meetingCategoryLabels[selectedCategory];
+
+  const openCreateMeeting = () => {
+    router.push('/(tabs)/tour/create');
+  };
+
   return (
-    <ScreenLayout contentContainerStyle={styles.content}>
-      <FadeInView index={0}>
-        <AppButton
-          label="모임 만들기"
-          size="lg"
-          fullWidth
-          onPress={() => router.push('/(tabs)/tour/create')}
-        />
-      </FadeInView>
+    <View style={styles.screen}>
+      <ScreenLayout contentContainerStyle={styles.content}>
+        <FadeInView index={0}>
+          <MeetingCategoryTabs value={selectedCategory} onChange={setSelectedCategory} />
+        </FadeInView>
 
-      <FadeInView index={1}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chipRow}>
-          {meetingCategoryFilters.map((label, index) => (
-            <AppChip
-              key={label}
-              label={label}
-              selected={selectedCategoryIndex === index}
-              onPress={() => setSelectedCategoryIndex(index)}
-            />
-          ))}
-        </ScrollView>
-      </FadeInView>
+        <MeetingCategoryContent category={selectedCategory}>
+          {filteredMeetings.length > 0 ? (
+            <View style={styles.list}>
+              {filteredMeetings.map((meeting) => (
+                <TourListItem
+                  key={meeting.id}
+                  meeting={meeting}
+                  onPress={() => router.push(`/(tabs)/tour/${meeting.id}`)}
+                />
+              ))}
+            </View>
+          ) : (
+            <AppCard variant="soft" style={styles.emptyCard}>
+              <AppText variant="h3">{`${categoryLabel} 모집 중인 모임이 없습니다`}</AppText>
+              <AppText variant="bodySmall" color="textSecondary">
+                {`${categoryLabel} 모임을 새로 만들어 보세요.`}
+              </AppText>
+            </AppCard>
+          )}
+        </MeetingCategoryContent>
+      </ScreenLayout>
 
-      <FadeInView index={2}>
-        <SectionHeader
-          title="모임"
-          subtitle={`모집 중 ${filteredMeetings.length}개`}
-          compact
-        />
-        {filteredMeetings.length > 0 ? (
-          <View style={styles.list}>
-            {filteredMeetings.map((meeting) => (
-              <TourListItem
-                key={meeting.id}
-                meeting={meeting}
-                onPress={() => router.push(`/(tabs)/tour/${meeting.id}`)}
-              />
-            ))}
-          </View>
-        ) : (
-          <AppCard variant="soft" style={styles.emptyCard}>
-            <AppText variant="h3">모집 중인 모임이 없습니다</AppText>
-            <AppText variant="bodySmall" style={styles.emptyText}>
-              새 다이빙 모임을 만들거나 필터를 변경해 보세요.
-            </AppText>
-            <AppButton
-              label="모임 만들기"
-              variant="secondary"
-              onPress={() => router.push('/(tabs)/tour/create')}
-            />
-          </AppCard>
-        )}
-      </FadeInView>
-    </ScreenLayout>
+      <MeetingRecruitFab onPress={openCreateMeeting} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
   content: {
     gap: spacing.lg,
-  },
-  chipRow: {
-    gap: spacing.sm,
-    paddingRight: spacing.lg,
   },
   list: {
     gap: spacing.lg,
@@ -102,8 +78,5 @@ const styles = StyleSheet.create({
   emptyCard: {
     gap: spacing.sm,
     alignItems: 'flex-start',
-  },
-  emptyText: {
-    marginBottom: spacing.sm,
   },
 });

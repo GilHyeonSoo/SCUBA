@@ -5,13 +5,10 @@ import type {
   MeetingPurpose,
 } from '@/src/features/tour/types';
 
-export const meetingCategoryFilters = ['전체', '버디찾기', '투어모집', '교육목적'] as const;
-
-export const meetingCategoryValues: Array<MeetingCategory | 'all'> = [
-  'all',
-  'buddy',
-  'tour',
-  'education',
+export const meetingCategoryTabs: Array<{ value: MeetingCategory; label: string }> = [
+  { value: 'buddy', label: '버디찾기' },
+  { value: 'tour', label: '투어모집' },
+  { value: 'education', label: '교육목적' },
 ];
 
 export const meetingCategoryLabels: Record<MeetingCategory, string> = {

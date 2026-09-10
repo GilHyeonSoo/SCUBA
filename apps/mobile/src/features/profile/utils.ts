@@ -1,4 +1,5 @@
 import {
+  disciplineOptions,
   freedivingLevelConfig,
   scubaLevelConfig,
 } from '@/src/features/profile/constants';
@@ -68,4 +69,37 @@ export function normalizeFreedivingLevel(level: FreedivingLevel | null): Freediv
 export function formatProfileGreeting(displayName: string): string {
   const name = displayName.trim() || '다이버';
   return `안녕하세요, ${name}님`;
+}
+
+export function getProfileDisciplineLines(profile: DiverProfile): string[] {
+  const disciplineLabel =
+    disciplineOptions.find((option) => option.value === profile.discipline)?.label ?? '다이빙';
+  const lines: string[] = [];
+
+  if ((profile.discipline === 'scuba' || profile.discipline === 'both') && profile.scubaLevel) {
+    const level = scubaLevelConfig[profile.scubaLevel];
+    lines.push(
+      profile.discipline === 'both'
+        ? `스킨스쿠버 · ${level.shortLabel}`
+        : `${disciplineLabel} · ${level.shortLabel}`,
+    );
+  }
+
+  if (
+    (profile.discipline === 'freediving' || profile.discipline === 'both') &&
+    profile.freedivingLevel
+  ) {
+    const level = freedivingLevelConfig[profile.freedivingLevel];
+    lines.push(
+      profile.discipline === 'both'
+        ? `프리다이빙 · ${level.shortLabel}`
+        : `${disciplineLabel} · ${level.shortLabel}`,
+    );
+  }
+
+  if (lines.length === 0) {
+    lines.push(disciplineLabel);
+  }
+
+  return lines;
 }

@@ -1,7 +1,15 @@
-import { Platform } from 'react-native';
+import { spacing } from './spacing';
 
-const TAB_BAR_ESTIMATE = Platform.OS === 'ios' ? 88 : 72;
+export const floatingTabBar = {
+  barHeight: 64,
+  bottomGap: 4,
+  horizontalInset: 16,
+} as const;
 
 export function getTabBarChromeHeight(bottomSafeArea: number): number {
-  return TAB_BAR_ESTIMATE + bottomSafeArea;
+  return (
+    floatingTabBar.barHeight +
+    floatingTabBar.bottomGap +
+    Math.max(bottomSafeArea, spacing.sm)
+  );
 }

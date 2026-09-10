@@ -1,4 +1,4 @@
-import { meetingCategoryValues } from '@/src/features/tour/constants';
+import type { MeetingCategory } from '@/src/features/tour/types';
 import type { DiveMeeting, MeetingDraft } from '@/src/features/tour/types';
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
@@ -36,14 +36,8 @@ export function formatMeetingParticipants(meeting: DiveMeeting): string {
 
 export function filterMeetings(
   meetings: DiveMeeting[],
-  categoryFilterIndex: number,
+  category: MeetingCategory,
 ): DiveMeeting[] {
-  const category = meetingCategoryValues[categoryFilterIndex] ?? 'all';
-
-  if (category === 'all') {
-    return meetings;
-  }
-
   return meetings.filter((meeting) => meeting.category === category);
 }
 
