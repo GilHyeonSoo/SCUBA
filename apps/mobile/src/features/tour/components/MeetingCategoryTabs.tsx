@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { AppText } from '@/src/components/ui';
-import { animation, colors, radius, spacing } from '@/src/constants';
+import { colors, radius, spacing } from '@/src/constants';
+
+const TAB_TRANSITION_MS = 220;
+const TAB_TRANSITION_EASING = Easing.out(Easing.cubic);
 import { meetingCategoryTabs } from '@/src/features/tour/constants';
 import type { MeetingCategory } from '@/src/features/tour/types';
 
@@ -28,8 +32,14 @@ export function MeetingCategoryTabs({ value, onChange }: MeetingCategoryTabsProp
 
   const movePill = useCallback(
     (layout: TabLayout) => {
-      pillX.value = withSpring(layout.x, animation.spring);
-      pillWidth.value = withSpring(layout.width, animation.spring);
+      pillX.value = withTiming(layout.x, {
+        duration: TAB_TRANSITION_MS,
+        easing: TAB_TRANSITION_EASING,
+      });
+      pillWidth.value = withTiming(layout.width, {
+        duration: TAB_TRANSITION_MS,
+        easing: TAB_TRANSITION_EASING,
+      });
     },
     [pillWidth, pillX],
   );

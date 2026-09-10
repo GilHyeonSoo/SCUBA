@@ -1,49 +1,109 @@
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FlatList,
+  LayoutChangeEvent,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  StyleSheet,
+  View,
+  type ListRenderItem,
+} from 'react-native';
 
-import { FadeInView } from '@/src/components/motion';
 import { ScreenLayout } from '@/src/components/layout/ScreenLayout';
 import { AppCard, AppText } from '@/src/components/ui';
-import { spacing } from '@/src/constants';
-import { MeetingCategoryContent } from '@/src/features/tour/components/MeetingCategoryContent';
+import { colors, spacing } from '@/src/constants';
 import { MeetingCategoryTabs } from '@/src/features/tour/components/MeetingCategoryTabs';
+import { MeetingListItem } from '@/src/features/tour/components/MeetingListItem';
 import { MeetingRecruitFab } from '@/src/features/tour/components/MeetingRecruitFab';
-import { TourListItem } from '@/src/features/tour/components/TourListItem';
-import { meetingCategoryLabels } from '@/src/features/tour/constants';
+import { meetingCategoryLabels, meetingCategoryTabs } from '@/src/features/tour/constants';
 import { useMeetingStore } from '@/src/features/tour/stores/meeting-store';
 import type { MeetingCategory } from '@/src/features/tour/types';
 import { filterMeetings } from '@/src/features/tour/utils';
 
+type CategoryTab = (typeof meetingCategoryTabs)[number];
+
 export default function TourScreen() {
   const router = useRouter();
   const meetings = useMeetingStore((state) => state.meetings);
+  const pagerRef = useRef<FlatList<CategoryTab>>(null);
   const [selectedCategory, setSelectedCategory] = useState<MeetingCategory>('buddy');
+  const [pagerWidth, setPagerWidth] = useState(0);
 
-  const filteredMeetings = useMemo(
-    () => filterMeetings(meetings, selectedCategory),
-    [meetings, selectedCategory],
+  const selectedIndex = meetingCategoryTabs.findIndex((tab) => tab.value === selectedCategory);
+
+  const handlePagerLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextWidth = Math.round(event.nativeEvent.layout.width);
+    if (nextWidth > 0) {
+      setPagerWidth((current) => (current === nextWidth ? current : nextWidth));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (pagerWidth <= 0 || selectedIndex < 0) {
+      return;
+    }
+
+    pagerRef.current?.scrollToOffset({
+      offset: selectedIndex * pagerWidth,
+      animated: false,
+    });
+  }, [pagerWidth]);
+
+  const handleCategoryChange = useCallback(
+    (category: MeetingCategory) => {
+      const index = meetingCategoryTabs.findIndex((tab) => tab.value === category);
+      if (index < 0) {
+        return;
+      }
+
+      setSelectedCategory(category);
+
+      if (pagerWidth > 0) {
+        pagerRef.current?.scrollToOffset({
+          offset: index * pagerWidth,
+          animated: true,
+        });
+      }
+    },
+    [pagerWidth],
   );
 
-  const categoryLabel = meetingCategoryLabels[selectedCategory];
+  const handlePagerMomentumEnd = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (pagerWidth <= 0) {
+        return;
+      }
 
-  const openCreateMeeting = () => {
-    router.push('/(tabs)/tour/create');
-  };
+      const index = Math.round(event.nativeEvent.contentOffset.x / pagerWidth);
+      const category = meetingCategoryTabs[index]?.value;
+      if (category) {
+        setSelectedCategory(category);
+      }
+    },
+    [pagerWidth],
+  );
 
-  return (
-    <View style={styles.screen}>
-      <ScreenLayout contentContainerStyle={styles.content}>
-        <FadeInView index={0}>
-          <MeetingCategoryTabs value={selectedCategory} onChange={setSelectedCategory} />
-        </FadeInView>
+  const renderCategoryPage: ListRenderItem<CategoryTab> = useCallback(
+    ({ item }) => {
+      const filteredMeetings = filterMeetings(meetings, item.value);
+      const categoryLabel = meetingCategoryLabels[item.value];
 
-        <MeetingCategoryContent category={selectedCategory}>
+      const listStyle =
+        item.value === 'buddy'
+          ? styles.buddyList
+          : item.value === 'tour'
+            ? styles.tourList
+            : styles.educationList;
+
+      return (
+        <View style={[styles.page, pagerWidth > 0 && { width: pagerWidth }]}>
           {filteredMeetings.length > 0 ? (
-            <View style={styles.list}>
+            <View style={listStyle}>
               {filteredMeetings.map((meeting) => (
-                <TourListItem
+                <MeetingListItem
                   key={meeting.id}
+                  category={item.value}
                   meeting={meeting}
                   onPress={() => router.push(`/(tabs)/tour/${meeting.id}`)}
                 />
@@ -57,10 +117,44 @@ export default function TourScreen() {
               </AppText>
             </AppCard>
           )}
-        </MeetingCategoryContent>
+        </View>
+      );
+    },
+    [meetings, pagerWidth, router],
+  );
+
+  return (
+    <View style={styles.screen}>
+      <ScreenLayout contentContainerStyle={styles.content}>
+        <MeetingCategoryTabs value={selectedCategory} onChange={handleCategoryChange} />
+
+        <View onLayout={handlePagerLayout} style={styles.pagerViewport}>
+          {pagerWidth > 0 ? (
+            <FlatList
+              ref={pagerRef}
+              data={meetingCategoryTabs}
+              horizontal
+              pagingEnabled
+              scrollEnabled={selectedCategory !== 'tour'}
+              bounces={false}
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.value}
+              renderItem={renderCategoryPage}
+              onMomentumScrollEnd={handlePagerMomentumEnd}
+              getItemLayout={(_, index) => ({
+                length: pagerWidth,
+                offset: pagerWidth * index,
+                index,
+              })}
+              style={styles.pager}
+              contentContainerStyle={styles.pagerContent}
+            />
+          ) : null}
+        </View>
       </ScreenLayout>
 
-      <MeetingRecruitFab onPress={openCreateMeeting} />
+      <MeetingRecruitFab onPress={() => router.push('/(tabs)/tour/create')} />
     </View>
   );
 }
@@ -72,7 +166,26 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
   },
-  list: {
+  pagerViewport: {
+    width: '100%',
+  },
+  pager: {
+    flexGrow: 0,
+  },
+  pagerContent: {
+    flexGrow: 1,
+  },
+  page: {
+    flexGrow: 1,
+  },
+  buddyList: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.divider,
+  },
+  tourList: {
+    gap: spacing.xl,
+  },
+  educationList: {
     gap: spacing.lg,
   },
   emptyCard: {

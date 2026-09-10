@@ -10,6 +10,7 @@ import type { DiveMeeting } from '@/src/features/tour/types';
 type MeetingCoverImageProps = {
   meeting: DiveMeeting;
   edgeToEdge?: boolean;
+  variant?: 'featured' | 'thumbnail' | 'hero';
 };
 
 const environmentIcons = {
@@ -22,9 +23,25 @@ const environmentGradients = {
   sea: [colors.primaryMuted, colors.primaryMid, colors.primaryStrong],
 } as const;
 
-export function MeetingCoverImage({ meeting, edgeToEdge = false }: MeetingCoverImageProps) {
-  const imageStyle = [styles.image, edgeToEdge && styles.imageEdgeToEdge];
-  const placeholderStyle = [styles.placeholder, edgeToEdge && styles.imageEdgeToEdge];
+export function MeetingCoverImage({
+  meeting,
+  edgeToEdge = false,
+  variant = 'featured',
+}: MeetingCoverImageProps) {
+  const isThumbnail = variant === 'thumbnail';
+  const isHero = variant === 'hero';
+  const imageStyle = [
+    styles.image,
+    isThumbnail && styles.imageThumbnail,
+    isHero && styles.imageHero,
+    edgeToEdge && styles.imageEdgeToEdge,
+  ];
+  const placeholderStyle = [
+    styles.placeholder,
+    isThumbnail && styles.imageThumbnail,
+    isHero && styles.imageHero,
+    edgeToEdge && styles.imageEdgeToEdge,
+  ];
 
   if (meeting.coverImageUrl) {
     return (
@@ -42,10 +59,16 @@ export function MeetingCoverImage({ meeting, edgeToEdge = false }: MeetingCoverI
 
   return (
     <LinearGradient colors={[...gradientColors]} style={placeholderStyle}>
-      <Ionicons name={iconName} size={36} color={colors.white} />
-      <AppText variant="caption" style={styles.placeholderLabel}>
-        {meetingCategoryLabels[meeting.category]}
-      </AppText>
+      <Ionicons
+        name={iconName}
+        size={isThumbnail ? 22 : isHero ? 48 : 36}
+        color={colors.white}
+      />
+      {!isThumbnail && !isHero ? (
+        <AppText variant="caption" style={styles.placeholderLabel}>
+          {meetingCategoryLabels[meeting.category]}
+        </AppText>
+      ) : null}
     </LinearGradient>
   );
 }
@@ -56,6 +79,16 @@ const styles = StyleSheet.create({
     height: 168,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
+  },
+  imageThumbnail: {
+    width: 88,
+    height: 88,
+    borderRadius: radius.md,
+  },
+  imageHero: {
+    width: '100%',
+    height: 224,
+    borderRadius: 0,
   },
   placeholder: {
     width: '100%',

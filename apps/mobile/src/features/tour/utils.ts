@@ -34,6 +34,10 @@ export function formatMeetingParticipants(meeting: DiveMeeting): string {
   return `${meeting.currentParticipants}/${meeting.maxParticipants}`;
 }
 
+export function formatMeetingScheduleLine(meeting: DiveMeeting): string {
+  return `${formatMeetingDateCompact(meeting.date)} ${meeting.time} · ${meeting.location}`;
+}
+
 export function filterMeetings(
   meetings: DiveMeeting[],
   category: MeetingCategory,
