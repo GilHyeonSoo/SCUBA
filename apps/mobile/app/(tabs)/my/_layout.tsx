@@ -10,6 +10,8 @@ export default function MyTabLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="profile" />
       <Stack.Screen name="gear" />
+      <Stack.Screen name="followers" />
+      <Stack.Screen name="following" />
     </Stack>
   );
 }

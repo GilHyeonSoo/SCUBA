@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
+  ImageBackground,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -18,6 +19,7 @@ import { colors, layout, radius, shadows, spacing } from '@/src/constants';
 import type { HomeAdBanner } from '@/src/features/home/mock-data';
 
 const AUTO_SLIDE_MS = 4500;
+const SLIDE_HEIGHT = 184;
 
 type HomeAdCarouselProps = {
   banners: HomeAdBanner[];
@@ -111,36 +113,69 @@ export function HomeAdCarousel({ banners, style }: HomeAdCarouselProps) {
         renderItem={({ item }) => (
           <Pressable
             accessibilityRole="button"
+            accessibilityLabel={`${item.sponsor} 광고, ${item.title}`}
             style={{ width: slideWidth }}
             onPress={() => {
               // Placeholder until ad destinations are wired.
             }}>
-            <LinearGradient
-              colors={[...item.gradient]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[styles.slide, shadows.md]}>
-              {item.badge ? (
-                <View style={styles.badge}>
-                  <AppText variant="caption" style={styles.badgeText}>
-                    {item.badge}
+            <ImageBackground
+              source={{ uri: item.imageUri }}
+              style={[styles.slide, shadows.md]}
+              imageStyle={styles.slideImage}
+              resizeMode="cover"
+              accessibilityIgnoresInvertColors>
+              <LinearGradient
+                colors={[...item.gradient]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <LinearGradient
+                colors={['rgba(0,0,0,0.45)', 'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 0.55 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(4,18,36,0.92)']}
+                locations={[0.35, 1]}
+                style={StyleSheet.absoluteFill}
+              />
+
+              <View style={styles.topRow}>
+                <View style={styles.adLabel}>
+                  <AppText variant="caption" style={styles.adLabelText}>
+                    광고
                   </AppText>
                 </View>
-              ) : null}
-              <AppText variant="h3" style={styles.title}>
-                {item.title}
-              </AppText>
-              <AppText variant="bodySmall" style={styles.subtitle}>
-                {item.subtitle}
-              </AppText>
-              {item.cta ? (
-                <View style={styles.ctaPill}>
-                  <AppText variant="label" style={styles.ctaText}>
-                    {item.cta}
-                  </AppText>
-                </View>
-              ) : null}
-            </LinearGradient>
+                <AppText variant="caption" style={styles.sponsorText} numberOfLines={1}>
+                  {item.sponsor}
+                </AppText>
+              </View>
+
+              <View style={styles.content}>
+                {item.badge ? (
+                  <View style={styles.badge}>
+                    <AppText variant="caption" style={styles.badgeText}>
+                      {item.badge}
+                    </AppText>
+                  </View>
+                ) : null}
+                <AppText variant="h3" style={styles.title} numberOfLines={2}>
+                  {item.title}
+                </AppText>
+                <AppText variant="bodySmall" style={styles.subtitle} numberOfLines={2}>
+                  {item.subtitle}
+                </AppText>
+                {item.cta ? (
+                  <View style={styles.ctaPill}>
+                    <AppText variant="label" style={styles.ctaText}>
+                      {item.cta}
+                    </AppText>
+                  </View>
+                ) : null}
+              </View>
+            </ImageBackground>
           </Pressable>
         )}
       />
@@ -165,18 +200,56 @@ const styles = StyleSheet.create({
   },
   slide: {
     borderRadius: radius.xl,
-    padding: spacing.xl,
-    minHeight: 148,
-    justifyContent: 'flex-end',
+    overflow: 'hidden',
+    height: SLIDE_HEIGHT,
+    justifyContent: 'space-between',
+  },
+  slideImage: {
+    borderRadius: radius.xl,
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    gap: spacing.sm,
+    zIndex: 1,
+  },
+  adLabel: {
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: radius.sm,
+  },
+  adLabelText: {
+    color: colors.textSecondary,
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+  },
+  sponsorText: {
+    flex: 1,
+    textAlign: 'right',
+    color: 'rgba(255,255,255,0.88)',
+    fontWeight: '500',
+  },
+  content: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
     gap: spacing.xs,
+    zIndex: 1,
   },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: radius.full,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   badgeText: {
     color: colors.textOnPrimary,
@@ -191,14 +264,15 @@ const styles = StyleSheet.create({
   },
   ctaPill: {
     alignSelf: 'flex-start',
-    marginTop: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.16)',
-    paddingHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    backgroundColor: colors.textOnPrimary,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     borderRadius: radius.full,
   },
   ctaText: {
-    color: colors.textOnPrimary,
+    color: colors.primaryStrong,
+    fontWeight: '700',
   },
   dots: {
     flexDirection: 'row',

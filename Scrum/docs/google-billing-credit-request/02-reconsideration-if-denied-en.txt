@@ -1,0 +1,17 @@
+Subject: [Reconsideration] Places API (New) KRW 105,761 — accidental one-day dev usage (Case #[CASE_ID])
+
+Hello,
+
+I am requesting reconsideration of my prior billing credit request (Case #[CASE_ID]) for accidental Places API (New) usage on September 12, 2026 (KRW 105,761).
+
+This was not production/end-user traffic. It was caused by a local offline enrichment script run during pre-launch development, with no meaningful Places API usage on other days.
+
+Additional evidence:
+- Billing report shows a single-day spike on 2026-09-12 (attachment re-attached)
+- ~1,103 Place Details calls + ~2,685 Photo Media calls (consistent with enrichment logs)
+- Production mobile app does not call Google Places API
+- Remediation: API disabled by default, explicit cost confirmation, hard limits, batch skip
+
+If a full credit is not possible, I kindly request a partial one-time credit for the September 12 Places API (New) charges as a good-faith developer mistake.
+
+Thank you.

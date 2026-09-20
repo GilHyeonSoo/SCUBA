@@ -1,0 +1,24 @@
+{
+  "billingAccountId": "011843-972E29-96641B",
+  "service": "Places API (New)",
+  "amountKrw": 105761,
+  "spikeDate": "2026-09-12",
+  "enrichmentRunsObserved": 3,
+  "placesProcessedPerRun": 1103,
+  "estimatedPlaceDetailsCallsPerRun": 1103,
+  "estimatedPhotoMediaCallsPerRun": 2685,
+  "estimatedTotalBillableCallsAllRuns": "~11,000+",
+  "productionAppCallsGooglePlaces": false,
+  "scriptPath": "Scrum/scripts/enrich-places.ts",
+  "remediationApplied": [
+    "GOOGLE_PLACES_API_ENABLED=false",
+    "GOOGLE_PLACES_CONFIRM required",
+    "GOOGLE_PLACES_MAX_BILLABLE_CALLS=100",
+    "GOOGLE_PLACES_MAX_PHOTOS_PER_PLACE=0",
+    "GOOGLE_PLACES_SKIP_EXISTING_BATCHES=true"
+  ],
+  "evidenceFiles": [
+    "evidence/billing-report-2026-09-12.png",
+    "../output/enriched/enrichment-report.json"
+  ]
+}

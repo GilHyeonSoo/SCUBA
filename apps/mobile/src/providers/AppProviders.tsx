@@ -3,10 +3,16 @@ import { ReactNode, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { MobileViewport } from '@/src/components/layout/MobileViewport';
+import { useSupabaseAuth } from '@/src/hooks/useSupabaseAuth';
 
 type AppProvidersProps = {
   children: ReactNode;
 };
+
+function SupabaseAuthBridge() {
+  useSupabaseAuth();
+  return null;
+}
 
 export function AppProviders({ children }: AppProvidersProps) {
   const [queryClient] = useState(
@@ -24,6 +30,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
+        <SupabaseAuthBridge />
         <MobileViewport>{children}</MobileViewport>
       </QueryClientProvider>
     </SafeAreaProvider>

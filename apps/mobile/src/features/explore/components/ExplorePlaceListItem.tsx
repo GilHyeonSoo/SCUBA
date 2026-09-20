@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/src/components/ui';
 import { colors, radius, spacing } from '@/src/constants';
@@ -18,17 +19,35 @@ type ExplorePlaceListItemProps = {
 };
 
 export function ExplorePlaceListItem({ place, onPress }: ExplorePlaceListItemProps) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  const metaParts = [place.categoryLabel, place.address];
+  if (place.shortDescription) {
+    metaParts.push(place.shortDescription);
+  }
+
+  const showThumbnail = Boolean(place.primaryImageUrl) && !imageFailed;
+
   return (
     <Pressable onPress={onPress} style={styles.row}>
-      <View style={styles.iconWrap}>
-        <Ionicons name={categoryIcons[place.category]} size={18} color={colors.primary} />
-      </View>
+      {showThumbnail ? (
+        <Image
+          source={{ uri: place.primaryImageUrl }}
+          style={styles.thumbnail}
+          resizeMode="cover"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <View style={styles.iconWrap}>
+          <Ionicons name={categoryIcons[place.category]} size={18} color={colors.primary} />
+        </View>
+      )}
       <View style={styles.content}>
         <AppText variant="body" style={styles.name}>
           {place.name}
         </AppText>
-        <AppText variant="caption" style={styles.meta}>
-          {`${place.categoryLabel} · ${place.address}`}
+        <AppText variant="caption" style={styles.meta} numberOfLines={2}>
+          {metaParts.join(' · ')}
         </AppText>
       </View>
       <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
@@ -52,6 +71,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  thumbnail: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
   },
   content: {
     flex: 1,

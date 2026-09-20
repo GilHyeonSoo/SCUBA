@@ -1,17 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, type ReactNode } from 'react';
 import {
   ActivityIndicator,
   Linking,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
 
 import { AppText } from '@/src/components/ui';
 import { colors, radius, spacing } from '@/src/constants';
+import { ExploreOperatingHoursTable } from '@/src/features/explore/components/ExploreOperatingHoursTable';
+import { ExplorePlacePhotoGallery } from '@/src/features/explore/components/ExplorePlacePhotoGallery';
 import type { ExplorePlaceDetail } from '@/src/features/explore/types';
 
 type ExplorePlaceDetailContentProps = {
@@ -28,13 +28,6 @@ type InfoRowProps = {
   icon: keyof typeof Ionicons.glyphMap;
   children: ReactNode;
   actions?: InfoAction[];
-};
-
-const categoryGradients: Record<ExplorePlaceDetail['category'], readonly [string, string]> = {
-  pool: ['#0090DB', '#005C96'],
-  site: ['#5383E6', '#005C96'],
-  shop: ['#3B6FD4', '#082B5C'],
-  tour: ['#C47A18', '#8A4F0F'],
 };
 
 function verificationLabel(status?: string, sourceCount?: number): string | null {
@@ -70,6 +63,10 @@ function formatSubtitle(place: ExplorePlaceDetail): string {
     parts.push(verification);
   }
 
+  if (place.enrichment?.knownDataApplied?.verified) {
+    parts.push('공식 정보 확인');
+  }
+
   return parts.join(' · ');
 }
 
@@ -94,46 +91,6 @@ function ExplorePlaceInfoRow({ icon, children, actions }: InfoRowProps) {
         ) : null}
       </View>
     </View>
-  );
-}
-
-function PlacePhotoGallery({ category }: { category: ExplorePlaceDetail['category'] }) {
-  const gradient = categoryGradients[category];
-
-  const photos = [
-    { id: 'main', width: 300, iconSize: 40 },
-    { id: 'sub-1', width: 200, iconSize: 32 },
-    { id: 'sub-2', width: 200, iconSize: 32 },
-  ] as const;
-
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.photoRow}>
-      {photos.map((photo) => (
-        <LinearGradient
-          key={photo.id}
-          colors={[...gradient]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.photoCard, { width: photo.width }]}>
-          <Ionicons
-            name={
-              category === 'pool'
-                ? 'water'
-                : category === 'site'
-                  ? 'location'
-                  : category === 'shop'
-                    ? 'storefront'
-                    : 'boat'
-            }
-            size={photo.iconSize}
-            color="rgba(255,255,255,0.9)"
-          />
-        </LinearGradient>
-      ))}
-    </ScrollView>
   );
 }
 
@@ -178,7 +135,40 @@ export function ExplorePlaceDetailContent({
         </AppText>
       </View>
 
-      <PlacePhotoGallery category={place.category} />
+      <ExplorePlacePhotoGallery category={place.category} images={place.images} />
+
+      {place.shortDescription ? (
+        <AppText variant="body" style={styles.description}>
+          {place.shortDescription}
+        </AppText>
+      ) : null}
+
+      {place.operatingHours && place.operatingHours.length > 0 ? (
+        <View style={styles.highlightSection}>
+          <AppText variant="label" style={styles.sectionTitle}>
+            운영 시간
+          </AppText>
+          <ExploreOperatingHoursTable rows={place.operatingHours} />
+        </View>
+      ) : null}
+
+      {place.highlights.length > 0 ? (
+        <View style={styles.highlightSection}>
+          <AppText variant="label" style={styles.sectionTitle}>
+            상세 정보
+          </AppText>
+          {place.highlights.map((highlight) => (
+            <View key={`${highlight.label}-${highlight.value}`} style={styles.highlightRow}>
+              <AppText variant="caption" style={styles.highlightLabel}>
+                {highlight.label}
+              </AppText>
+              <AppText variant="body" style={styles.highlightValue}>
+                {highlight.value}
+              </AppText>
+            </View>
+          ))}
+        </View>
+      ) : null}
 
       <View style={styles.infoSection}>
         <ExplorePlaceInfoRow
@@ -241,8 +231,6 @@ export function ExplorePlaceDetailContent({
   );
 }
 
-const photoHeight = 204;
-
 const styles = StyleSheet.create({
   content: {
     gap: spacing.lg,
@@ -260,16 +248,32 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.textSecondary,
   },
-  photoRow: {
-    gap: spacing.md,
-    paddingRight: spacing.md,
+  description: {
+    color: colors.textPrimary,
+    lineHeight: 22,
   },
-  photoCard: {
-    height: photoHeight,
+  highlightSection: {
+    gap: spacing.sm,
+    padding: spacing.md,
     borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  sectionTitle: {
+    color: colors.textPrimary,
+    fontWeight: '700',
+  },
+  highlightRow: {
+    gap: 2,
+  },
+  highlightLabel: {
+    color: colors.textTertiary,
+    fontWeight: '600',
+  },
+  highlightValue: {
+    color: colors.textPrimary,
+    lineHeight: 22,
   },
   infoSection: {
     borderTopWidth: 1,

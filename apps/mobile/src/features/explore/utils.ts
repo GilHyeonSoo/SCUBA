@@ -14,7 +14,8 @@ export function filterExplorePlaces(
   }
 
   return categoryFiltered.filter((place) => {
-    const haystack = `${place.name} ${place.address} ${place.categoryLabel}`.toLowerCase();
+    const haystack =
+      `${place.name} ${place.address} ${place.categoryLabel} ${place.shortDescription ?? ''}`.toLowerCase();
     return haystack.includes(normalizedQuery);
   });
 }

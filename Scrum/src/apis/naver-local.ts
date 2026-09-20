@@ -1,4 +1,5 @@
 import { config, requireEnv } from '../config.js';
+import { assertMapApiEnabled, isNaverLocalApiEnabled } from '../map-api-guard.js';
 import { sleep, uniqueBy } from '../save-json.js';
 import type { CollectionFile, NaverLocalItem, PlaceCategory, SearchQuery } from '../types.js';
 
@@ -50,6 +51,13 @@ export async function collectNaverLocal(
   queries: SearchQuery[],
   category: PlaceCategory,
 ): Promise<CollectionFile<NaverLocalItem>> {
+  assertMapApiEnabled('fetch:naver');
+  if (!isNaverLocalApiEnabled()) {
+    throw new Error(
+      '[fetch:naver] Naver Local API calls are disabled. Set MAP_API_ENABLED=true and NAVER_LOCAL_API_ENABLED=true to enable.',
+    );
+  }
+
   const clientId = requireEnv(config.naverClientId, 'NAVER_CLIENT_ID');
   const clientSecret = requireEnv(config.naverClientSecret, 'NAVER_CLIENT_SECRET');
   const items: NaverLocalItem[] = [];

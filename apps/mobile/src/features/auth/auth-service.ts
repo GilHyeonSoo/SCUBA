@@ -1,3 +1,4 @@
+import { getSupabaseClient, isSupabaseConfigured } from '@/src/services/supabase';
 import { SocialAuthProvider } from '@/src/features/auth/types';
 
 /**
@@ -14,11 +15,17 @@ export async function signInWithProvider(
     naver: '네이버',
   };
 
-  await new Promise((resolve) => setTimeout(resolve, 400));
+  if (!isSupabaseConfigured) {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    return {
+      success: false,
+      message: `${providerLabels[provider]} 로그인은 Supabase 연동 후 사용할 수 있습니다.`,
+    };
+  }
 
   return {
     success: false,
-    message: `${providerLabels[provider]} 로그인은 Supabase 연동 후 사용할 수 있습니다.`,
+    message: `${providerLabels[provider]} 로그인은 다음 단계에서 제공됩니다.`,
   };
 }
 
@@ -30,7 +37,21 @@ export async function signInWithEmail(
     return { success: false, message: '이메일과 비밀번호를 입력해주세요.' };
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 600));
+  const client = getSupabaseClient();
+  if (!client) {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    return { success: true };
+  }
+
+  const { error } = await client.auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
+
+  if (error) {
+    return { success: false, message: error.message };
+  }
+
   return { success: true };
 }
 
@@ -51,6 +72,29 @@ export async function signUpWithEmail(
     return { success: false, message: '비밀번호는 8자 이상이어야 합니다.' };
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  return { success: true };
+  const client = getSupabaseClient();
+  if (!client) {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    return { success: true };
+  }
+
+  const { error } = await client.auth.signUp({
+    email: email.trim(),
+    password,
+  });
+
+  if (error) {
+    return { success: false, message: error.message };
+  }
+
+  return { success: true, message: '가입이 완료되었습니다. 이메일 인증 후 로그인해 주세요.' };
+}
+
+export async function signOut(): Promise<void> {
+  const client = getSupabaseClient();
+  if (!client) {
+    return;
+  }
+
+  await client.auth.signOut();
 }

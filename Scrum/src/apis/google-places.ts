@@ -1,4 +1,15 @@
 import { config, requireEnv } from '../config.js';
+import { assertMapApiEnabled } from '../map-api-guard.js';
+import {
+  getGooglePlacesMaxBillableCalls,
+  getGooglePlacesMaxPhotosPerPlace,
+  getGooglePlacesMaxPlaces,
+  GooglePlacesUsageTracker,
+  isGooglePlacesApiEnabled,
+  requireGooglePlacesConfirmation,
+  estimateEnrichmentGoogleUsage,
+  estimateTextSearchUsage,
+} from '../google-places-guard.js';
 import { sleep, uniqueBy } from '../save-json.js';
 import type { CollectionFile, GooglePlacesItem, PlaceCategory, SearchQuery } from '../types.js';
 
@@ -15,7 +26,12 @@ const FIELD_MASK = [
   'places.businessStatus',
 ].join(',');
 
-async function searchText(query: SearchQuery, apiKey: string): Promise<GooglePlacesItem[]> {
+async function searchText(
+  query: SearchQuery,
+  apiKey: string,
+  tracker: GooglePlacesUsageTracker,
+): Promise<GooglePlacesItem[]> {
+  tracker.record('text_search');
   const response = await fetch(PLACES_TEXT_SEARCH_URL, {
     method: 'POST',
     headers: {
@@ -52,11 +68,19 @@ export async function collectGooglePlaces(
   queries: SearchQuery[],
   category: PlaceCategory,
 ): Promise<CollectionFile<GooglePlacesItem>> {
+  assertMapApiEnabled('fetch:google');
   const apiKey = requireEnv(config.googlePlacesApiKey, 'GOOGLE_PLACES_API_KEY');
+  const limitedQueries = queries.slice(0, getGooglePlacesMaxPlaces());
+  requireGooglePlacesConfirmation(
+    'fetch:google',
+    estimateTextSearchUsage(limitedQueries.length),
+  );
+
+  const tracker = new GooglePlacesUsageTracker(getGooglePlacesMaxBillableCalls());
   const items: GooglePlacesItem[] = [];
 
-  for (const query of queries) {
-    const results = await searchText(query, apiKey);
+  for (const query of limitedQueries) {
+    const results = await searchText(query, apiKey, tracker);
     items.push(...results);
     await sleep(config.requestDelayMs);
   }

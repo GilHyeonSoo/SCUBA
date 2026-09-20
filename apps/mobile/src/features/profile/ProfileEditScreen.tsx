@@ -20,7 +20,9 @@ import {
   scubaLevelOptions,
 } from '@/src/features/profile/constants';
 import { openProfileImagePicker } from '@/src/features/profile/services/profile-image-picker';
+import { useUpsertMyProfileRemote } from '@/src/features/profile/hooks/useProfileRemote';
 import { useProfileStore } from '@/src/features/profile/stores/profile-store';
+import { useSupabaseAuth } from '@/src/hooks/useSupabaseAuth';
 import type { DiverProfile, DiverProfileDraft } from '@/src/features/profile/types';
 import { getDefaultLevelForDiscipline } from '@/src/features/profile/utils';
 
@@ -85,6 +87,8 @@ export default function ProfileEditScreen() {
   const router = useRouter();
   const profile = useProfileStore((state) => state.profile);
   const updateProfile = useProfileStore((state) => state.updateProfile);
+  const { isRemoteSocialEnabled } = useSupabaseAuth();
+  const upsertProfileRemote = useUpsertMyProfileRemote();
   const [draft, setDraft] = useState<DiverProfileDraft>(() => toDraft(profile));
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -122,7 +126,7 @@ export default function ProfileEditScreen() {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const validationError = validateDraft(draft);
     if (validationError) {
       setError(validationError);
@@ -130,11 +134,24 @@ export default function ProfileEditScreen() {
     }
 
     setIsSaving(true);
-    updateProfile(toProfile(draft));
-    setIsSaving(false);
-    Alert.alert('저장 완료', '프로필이 업데이트되었습니다.', [
-      { text: '확인', onPress: () => router.back() },
-    ]);
+
+    try {
+      const nextProfile = toProfile(draft);
+
+      if (isRemoteSocialEnabled) {
+        await upsertProfileRemote.mutateAsync(nextProfile);
+      } else {
+        updateProfile(nextProfile);
+      }
+
+      Alert.alert('저장 완료', '프로필이 업데이트되었습니다.', [
+        { text: '확인', onPress: () => router.back() },
+      ]);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : '프로필 저장에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

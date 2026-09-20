@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppBadge, AppText } from '@/src/components/ui';
 import { colors, radius, spacing } from '@/src/constants';
@@ -6,6 +6,7 @@ import type { BuddyProfile } from '@/src/features/buddy/mock-data';
 
 type BuddyListItemProps = {
   buddy: BuddyProfile;
+  onPress?: (buddy: BuddyProfile) => void;
 };
 
 const diveTypeLabel = {
@@ -14,9 +15,12 @@ const diveTypeLabel = {
   both: '스쿠버 · 프리',
 } as const;
 
-export function BuddyListItem({ buddy }: BuddyListItemProps) {
+export function BuddyListItem({ buddy, onPress }: BuddyListItemProps) {
   return (
-    <View style={styles.row}>
+    <Pressable
+      accessibilityRole="button"
+      onPress={() => onPress?.(buddy)}
+      style={({ pressed }) => [styles.row, pressed && onPress && styles.rowPressed]}>
       <View style={styles.avatar}>
         <AppText variant="label" color="primary">
           {buddy.nickname.charAt(0)}
@@ -36,7 +40,7 @@ export function BuddyListItem({ buddy }: BuddyListItemProps) {
           {buddy.status}
         </AppText>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -48,6 +52,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
+  },
+  rowPressed: {
+    opacity: 0.7,
   },
   avatar: {
     width: 40,

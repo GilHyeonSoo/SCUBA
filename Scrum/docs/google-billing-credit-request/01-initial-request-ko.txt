@@ -1,0 +1,42 @@
+제목: Places API (New) 개발 실수 사용 — 일회성 청구 크레딧 요청
+
+---
+
+안녕하세요, Google Cloud Billing Support 팀.
+
+2026년 9월 12일, 제 결제 계정(011843-972E29-96641B)에 Places API (New) 사용료 ₩105,761이 하루 만에 청구되었습니다. 이는 의도한 프로덕션 서비스 트래픽이 아니라, 개발 중 오프라인 데이터 수집 스크립트의 실수로 발생한 비용입니다. 일회성 청구 조정(billing credit)을 검토해 주시기 바랍니다.
+
+■ 청구 요약
+- 결제 계정 ID: 011843-972E29-96641B
+- 서비스: Places API (New)
+- 청구 금액: ₩105,761
+- 발생 일자: 2026년 9월 12일 (당월 다른 날짜 사용량 거의 없음, 해당 일자에 급증)
+- 첨부: billing-report-2026-09-12.png (Billing → 보고서 화면 캡처)
+
+■ 원인
+저는 SCUBA(다이빙 앱) 프로젝트의 국내 다이빙 장소(샵/잠수풀/포인트) 데이터를 준비하기 위해, 로컬 개발용 스크립트 `Scrum/scripts/enrich-places.ts`를 실행했습니다.
+
+이 스크립트는 정규화된 장소 목록(약 1,103건)마다 Google Places API를 호출합니다.
+- Place Details (Enterprise급 필드: 전화, 웹사이트, 영업시간, editorialSummary, photos 등)
+- Place Photo Media (장소당 최대 3장)
+- 일부 fallback Text Search
+
+개발 과정에서 비용 상한·확인 절차 없이 스크립트가 여러 번 재실행되었고, 그 결과 API 호출이 중복 누적되었습니다.
+
+■ 프로덕션 트래픽이 아님을 확인하는 근거
+1. 모바일 앱(React Native)은 Google Places API를 호출하지 않으며, Supabase DB만 조회합니다.
+2. 과금은 오프라인 batch enrichment 스크립트 실행 시점(2026-09-12 19:10~19:16 UTC, 한국시간 9/13 새벽)과 일치합니다.
+3. enrichment 로그상 1,103건 × 23 batch 처리, Google Places 이미지 약 2,685건 수집 — Place Details + Photo API 대량 호출과 부합합니다.
+4. 해당일 이전에는 동일 서비스 사용 이력이 거의 없었고, Billing 보고서에서도 "신규" 급증으로 표시됩니다.
+
+■ 재발 방지 조치 (이미 적용)
+- GOOGLE_PLACES_API_ENABLED=false 로 API 호출 차단
+- 유료 호출 전 명시적 확인(GOOGLE_PLACES_CONFIRM) 및 호출 상한(장소 수/사진 수/총 billable calls) 추가
+- 기존 batch 파일 재처리 시 Google API skip
+- API 키 quota 제한 및 예산 알림 설정 예정
+
+■ 요청 사항
+Places API (New) 2026-09-12 발생분 ₩105,761에 대한 일회성 billing credit(청구 조정)을 검토해 주시기 바랍니다.
+초기 개발 실수이며, 동일 실수가 재발하지 않도록 가드레일을 적용했습니다.
+
+감사합니다.

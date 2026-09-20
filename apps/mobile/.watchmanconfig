@@ -1,10 +1,12 @@
 {
   "ignore_dirs": [
+    "node_modules",
     "ios",
     "android",
     ".expo",
-    "node_modules",
     "dist",
-    "web-build"
+    "web-build",
+    ".git",
+    ".cursor"
   ]
 }

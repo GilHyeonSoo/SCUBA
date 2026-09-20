@@ -1,4 +1,5 @@
 import { config, requireEnv } from '../config.js';
+import { assertMapApiEnabled, isKakaoLocalApiEnabled } from '../map-api-guard.js';
 import { sleep, uniqueBy } from '../save-json.js';
 import type { CollectionFile, KakaoLocalItem, PlaceCategory, SearchQuery } from '../types.js';
 
@@ -44,6 +45,13 @@ export async function collectKakaoLocal(
   queries: SearchQuery[],
   category: PlaceCategory,
 ): Promise<CollectionFile<KakaoLocalItem>> {
+  assertMapApiEnabled('fetch:kakao');
+  if (!isKakaoLocalApiEnabled()) {
+    throw new Error(
+      '[fetch:kakao] Kakao Local API calls are disabled. Set MAP_API_ENABLED=true and KAKAO_LOCAL_API_ENABLED=true to enable.',
+    );
+  }
+
   const restApiKey = requireEnv(config.kakaoRestApiKey, 'KAKAO_REST_API_KEY');
   const items: KakaoLocalItem[] = [];
 

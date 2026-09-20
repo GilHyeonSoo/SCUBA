@@ -7,7 +7,8 @@ const workspaceRoot = path.resolve(projectRoot, '../..');
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(projectRoot);
 
-config.watchFolders = [workspaceRoot];
+// pnpm monorepo: resolve hoisted deps from the workspace root, but only watch app source.
+config.watchFolders = [projectRoot];
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
@@ -24,48 +25,52 @@ config.resolver.extraNodeModules = {
 };
 
 const escapedProjectRoot = projectRoot.replace(/[/\\]/g, '[/\\\\]');
+const escapedWorkspaceRoot = workspaceRoot.replace(/[/\\]/g, '[/\\\\]');
+
+// Google Drive / macOS sync artifacts should never trigger Metro reloads.
+const syncArtifactPattern = /[/\\]\.(DS_Store|tmp\.driveupload|tmp\.drivedownload)([/\\]|$)/;
 
 config.resolver.blockList = [
   new RegExp(`^${escapedProjectRoot}[/\\\\]ios[/\\\\].*`),
   new RegExp(`^${escapedProjectRoot}[/\\\\]android[/\\\\].*`),
   new RegExp(`^${escapedProjectRoot}[/\\\\]\\.expo[/\\\\].*`),
+  new RegExp(`^${escapedProjectRoot}[/\\\\]dist[/\\\\].*`),
+  new RegExp(`^${escapedProjectRoot}[/\\\\]web-build[/\\\\].*`),
+  new RegExp(`^${escapedProjectRoot}[/\\\\]expo-env\\.d\\.ts$`),
+  new RegExp(`^${escapedProjectRoot}[/\\\\]\\.metro-health-check.*`),
+  new RegExp(`^${escapedWorkspaceRoot}[/\\\\]\\.git[/\\\\].*`),
+  new RegExp(`^${escapedWorkspaceRoot}[/\\\\]Scrum[/\\\\].*`),
+  new RegExp(`^${escapedWorkspaceRoot}[/\\\\]\\.cursor[/\\\\].*`),
+  new RegExp(`^${escapedWorkspaceRoot}[/\\\\]supabase[/\\\\]\\.temp[/\\\\].*`),
+  syncArtifactPattern,
 ];
 
 config.watcher = {
   ...config.watcher,
+  healthCheck: {
+    enabled: true,
+    interval: 3000,
+    timeout: 5000,
+  },
   additionalExclusions: [
+    path.join(projectRoot, 'node_modules'),
     path.join(projectRoot, 'ios'),
     path.join(projectRoot, 'android'),
     path.join(projectRoot, '.expo'),
+    path.join(projectRoot, 'dist'),
+    path.join(projectRoot, 'web-build'),
+    path.join(projectRoot, 'expo-env.d.ts'),
+    path.join(workspaceRoot, '.git'),
+    path.join(workspaceRoot, 'Scrum'),
+    path.join(workspaceRoot, '.cursor'),
+    path.join(workspaceRoot, 'supabase', '.temp'),
   ],
 };
 
 const mapboxWebStub = path.resolve(projectRoot, 'src/services/mapbox.web.ts');
-const expoHmrEntry = require.resolve('expo/src/async-require/hmr.ts');
-const expoLogBoxEntry = require.resolve('@expo/log-box/src/LogBox.ts');
 const upstreamResolveRequest = config.resolver.resolveRequest;
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (
-    moduleName === 'expo/src/async-require/hmr' ||
-    moduleName === 'expo/src/async-require/hmr.ts'
-  ) {
-    return {
-      filePath: expoHmrEntry,
-      type: 'sourceFile',
-    };
-  }
-
-  if (
-    moduleName === '@expo/log-box/src/LogBox' ||
-    moduleName === '@expo/log-box/src/LogBox.ts'
-  ) {
-    return {
-      filePath: expoLogBoxEntry,
-      type: 'sourceFile',
-    };
-  }
-
   if (platform === 'web' && moduleName === '@rnmapbox/maps') {
     return {
       filePath: mapboxWebStub,

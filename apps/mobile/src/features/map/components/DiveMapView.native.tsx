@@ -20,6 +20,7 @@ import type {
   MapViewport,
 } from '@/src/features/map/types';
 import { initializeMapbox, isMapboxConfigured } from '@/src/services/mapbox';
+import { MAP_API_DISABLED_MESSAGE } from '@/src/services/map-api-guard';
 
 import { DiveMapViewFallback } from './DiveMapViewFallback';
 
@@ -172,7 +173,7 @@ export const DiveMapView = forwardRef<DiveMapViewRef, DiveMapViewProps>(function
         bottomInset={bottomInset}
         initialCenter={initialCenter}
         style={style}
-        message="Mapbox 토큰이 필요합니다"
+        message={MAP_API_DISABLED_MESSAGE}
       />
     );
   }

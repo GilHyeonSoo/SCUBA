@@ -12,12 +12,24 @@ const GRID_GAP = 1;
 const CELL_ASPECT_RATIO = 1.2;
 
 type ProfileGalleryGridProps = {
-  onImagePress: (image: ProfileGalleryImage) => void;
+  images?: ProfileGalleryImage[];
+  showAddButton?: boolean;
+  isAdding?: boolean;
+  onImagePress: (image: ProfileGalleryImage, index: number) => void;
+  onAddImage?: () => void;
 };
 
-export function ProfileGalleryGrid({ onImagePress }: ProfileGalleryGridProps) {
-  const images = useProfileGalleryStore((state) => state.images);
+export function ProfileGalleryGrid({
+  images: imagesOverride,
+  showAddButton = true,
+  isAdding = false,
+  onImagePress,
+  onAddImage,
+}: ProfileGalleryGridProps) {
+  const storeImages = useProfileGalleryStore((state) => state.images);
   const addImage = useProfileGalleryStore((state) => state.addImage);
+  const images = imagesOverride ?? storeImages;
+
   const { cellWidth, cellHeight } = useMemo(() => {
     const screenWidth = Dimensions.get('window').width;
     const width = (screenWidth - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
@@ -28,6 +40,11 @@ export function ProfileGalleryGrid({ onImagePress }: ProfileGalleryGridProps) {
   }, []);
 
   const handleAddImage = () => {
+    if (onAddImage) {
+      onAddImage();
+      return;
+    }
+
     openGalleryImagePicker((uri) => {
       addImage(uri);
     });
@@ -43,7 +60,7 @@ export function ProfileGalleryGrid({ onImagePress }: ProfileGalleryGridProps) {
             key={image.id}
             accessibilityRole="imagebutton"
             accessibilityLabel="프로필 사진 보기"
-            onPress={() => onImagePress(image)}
+            onPress={() => onImagePress(image, index)}
             style={[
               styles.cell,
               {
@@ -54,33 +71,32 @@ export function ProfileGalleryGrid({ onImagePress }: ProfileGalleryGridProps) {
               },
             ]}>
             <View style={styles.imageFrame}>
-              <Image
-                source={{ uri: image.uri }}
-                style={styles.image}
-                resizeMode="cover"
-              />
+              <Image source={{ uri: image.uri }} style={styles.image} resizeMode="cover" />
             </View>
           </Pressable>
         );
       })}
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="사진 추가"
-        onPress={handleAddImage}
-        style={[
-          styles.cell,
-          styles.addCell,
-          {
-            width: cellWidth,
-            height: cellHeight,
-            marginRight:
-              (images.length + 1) % GRID_COLUMNS === 0 ? 0 : GRID_GAP,
-            marginBottom: GRID_GAP,
-          },
-        ]}>
-        <Ionicons name="add" size={28} color={colors.textSecondary} />
-      </Pressable>
+      {showAddButton ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="사진 추가"
+          disabled={isAdding}
+          onPress={handleAddImage}
+          style={[
+            styles.cell,
+            styles.addCell,
+            isAdding && styles.addCellDisabled,
+            {
+              width: cellWidth,
+              height: cellHeight,
+              marginRight: (images.length + 1) % GRID_COLUMNS === 0 ? 0 : GRID_GAP,
+              marginBottom: GRID_GAP,
+            },
+          ]}>
+          <Ionicons name="add" size={28} color={colors.textSecondary} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -106,5 +122,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
+  },
+  addCellDisabled: {
+    opacity: 0.5,
   },
 });

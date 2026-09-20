@@ -1,4 +1,6 @@
 import { config, requireEnv } from '../src/config.js';
+import { isGooglePlacesApiEnabled } from '../src/google-places-guard.js';
+import { isKakaoLocalApiEnabled, isNaverLocalApiEnabled } from '../src/map-api-guard.js';
 
 type CheckResult = {
   api: string;
@@ -8,6 +10,14 @@ type CheckResult = {
 };
 
 async function checkGoogle(): Promise<CheckResult> {
+  if (!isGooglePlacesApiEnabled()) {
+    return {
+      api: 'Google Places',
+      ok: true,
+      message: '건너뜀 (MAP_API_ENABLED / GOOGLE_PLACES_API_ENABLED=false)',
+    };
+  }
+
   try {
     const apiKey = requireEnv(config.googlePlacesApiKey, 'GOOGLE_PLACES_API_KEY');
     const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
@@ -52,6 +62,14 @@ async function checkGoogle(): Promise<CheckResult> {
 }
 
 async function checkNaver(): Promise<CheckResult> {
+  if (!isNaverLocalApiEnabled()) {
+    return {
+      api: 'Naver Local',
+      ok: true,
+      message: '건너뜀 (MAP_API_ENABLED / NAVER_LOCAL_API_ENABLED=false)',
+    };
+  }
+
   try {
     const clientId = requireEnv(config.naverClientId, 'NAVER_CLIENT_ID');
     const clientSecret = requireEnv(config.naverClientSecret, 'NAVER_CLIENT_SECRET');
@@ -93,6 +111,14 @@ async function checkNaver(): Promise<CheckResult> {
 }
 
 async function checkKakao(): Promise<CheckResult> {
+  if (!isKakaoLocalApiEnabled()) {
+    return {
+      api: 'Kakao Local',
+      ok: true,
+      message: '건너뜀 (MAP_API_ENABLED / KAKAO_LOCAL_API_ENABLED=false)',
+    };
+  }
+
   try {
     const restApiKey = requireEnv(config.kakaoRestApiKey, 'KAKAO_REST_API_KEY');
     const url = new URL('https://dapi.kakao.com/v2/local/search/keyword.json');

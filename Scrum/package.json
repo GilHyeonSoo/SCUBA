@@ -12,10 +12,17 @@
     "process:places": "tsx scripts/process-places.ts",
     "import:places": "tsx scripts/import-supabase.ts",
     "export:sql": "tsx scripts/export-sql-seed.ts",
-    "pipeline:places": "pnpm process:places && pnpm import:places"
+    "parse:dive-export": "tsx scripts/parse-dive-export.ts",
+    "import:dive-logs": "tsx scripts/import-dive-logs.ts",
+    "pipeline:dive-import": "pnpm parse:dive-export && pnpm import:dive-logs",
+    "pipeline:places": "pnpm process:places && pnpm enrich:places && pnpm import:places",
+    "enrich:places": "tsx scripts/enrich-places.ts",
+    "audit:enrichment": "tsx scripts/audit-enrichment.ts",
+    "preprocess:enrichment": "tsx scripts/preprocess-enrichment.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4"
+    "@supabase/supabase-js": "^2.57.4",
+    "fast-xml-parser": "^5.11.1"
   },
   "devDependencies": {
     "tsx": "^4.21.0",

@@ -22,4 +22,6 @@ export type ProfileGalleryImage = {
   id: string;
   uri: string;
   createdAt: number;
+  userId?: string;
+  caption?: string;
 };

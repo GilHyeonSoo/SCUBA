@@ -30,3 +30,9 @@ apps/mobile/android/
 
 # Supabase CLI local state
 supabase/.temp/
+
+# Dive computer export files (personal data)
+dive-export.ssrf
+dive-export.*
+*.ssrf
+Scrum/output/dive-import/

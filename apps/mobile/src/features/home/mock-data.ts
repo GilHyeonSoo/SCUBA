@@ -1,3 +1,5 @@
+import { homeAdImages } from '@/src/features/home/mock-data/home-ad-images';
+
 export type HomeDivePlan = {
   id: string;
   title: string;
@@ -46,6 +48,8 @@ export type HomeAdBanner = {
   subtitle: string;
   cta?: string;
   badge?: string;
+  sponsor: string;
+  imageUri: string;
   gradient: readonly [string, string, ...string[]];
 };
 
@@ -106,26 +110,32 @@ export const mockHomeData = {
     {
       id: 'ad1',
       badge: '공식 투어',
+      sponsor: '제주 마린다이브',
       title: '제주 서귀포 보트 다이빙',
       subtitle: '가을 시즌 얼리버드 · 잔여 2석',
       cta: '투어 보기',
-      gradient: ['#005C96', '#5383E6'],
+      imageUri: homeAdImages.jejuBoatTour,
+      gradient: ['rgba(0, 46, 88, 0.72)', 'rgba(0, 92, 150, 0.35)'],
     },
     {
       id: 'ad2',
       badge: '장비 특가',
+      sponsor: 'Shearwater Korea',
       title: '다이브 컴퓨터 업그레이드',
-      subtitle: 'Shearwater 페어링 가이드 포함',
+      subtitle: 'Teric · 펌웨어 업데이트 가이드 포함',
       cta: '추천 보기',
-      gradient: ['#0090DB', '#5383E6'],
+      imageUri: homeAdImages.diveComputer,
+      gradient: ['rgba(0, 80, 130, 0.78)', 'rgba(83, 131, 230, 0.28)'],
     },
     {
       id: 'ad3',
       badge: '다이브 풀',
+      sponsor: '잠실 잠수풀',
       title: '서울 실내 다이브 풀 예약',
       subtitle: '스쿠버 · 프리다이빙 연습 공간',
       cta: '풀 찾기',
-      gradient: ['#061F42', '#005C96'],
+      imageUri: homeAdImages.seoulDivePool,
+      gradient: ['rgba(6, 31, 66, 0.82)', 'rgba(0, 92, 150, 0.32)'],
     },
   ] as HomeAdBanner[],
 };

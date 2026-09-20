@@ -24,6 +24,8 @@ import {
   SocialAuthProvider,
   socialAuthProviders,
 } from '@/src/features/auth/types';
+import { getSupabaseSession } from '@/src/features/social/api/session';
+import { getSupabaseClient } from '@/src/services/supabase';
 import { useAuthStore } from '@/src/stores/auth-store';
 
 type AuthMode = 'login' | 'signup';
@@ -74,8 +76,28 @@ export default function AuthScreen({ mode = 'login' }: { mode?: AuthMode }) {
       return;
     }
 
-    setAuthenticated(true);
-    router.replace('/(tabs)');
+    const client = getSupabaseClient();
+    if (!client) {
+      setAuthenticated(true);
+      router.replace('/(tabs)');
+      return;
+    }
+
+    const session = await getSupabaseSession();
+    if (session) {
+      router.replace('/(tabs)');
+      return;
+    }
+
+    if (isSignup) {
+      Alert.alert('가입 완료', result.message ?? '이메일 인증 후 로그인해 주세요.');
+      setAuthMode('login');
+      setPassword('');
+      setPasswordConfirm('');
+      return;
+    }
+
+    setError('로그인 세션을 확인하지 못했습니다.');
   };
 
   const toggleMode = () => {

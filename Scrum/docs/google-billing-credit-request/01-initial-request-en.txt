@@ -1,0 +1,39 @@
+Subject: Accidental Places API (New) usage — one-time billing credit request
+
+Hello Google Cloud Billing Support,
+
+On September 12, 2026, my billing account (011843-972E29-96641B) was charged KRW 105,761 for "Places API (New)" in a single day. This was not intentional production traffic. It was caused by a developer mistake while running an offline data-enrichment script during project setup. I respectfully request a one-time billing adjustment (credit).
+
+Summary
+- Billing account ID: 011843-972E29-96641B
+- Service: Places API (New)
+- Amount: KRW 105,761
+- Spike date: September 12, 2026 (near-zero usage on other days in the same month)
+- Attachment: billing-report-2026-09-12.png
+
+Root cause
+I ran a local development script (Scrum/scripts/enrich-places.ts) to enrich ~1,103 normalized dive-location records (shops, pools, dive sites) for a mobile app database.
+
+For each location, the script called:
+- Place Details with Enterprise-tier fields (phone, website, opening hours, editorialSummary, photos, etc.)
+- Place Photo Media (up to 3 photos per location)
+- occasional Text Search fallback
+
+The script was re-run multiple times during development without cost guardrails, causing duplicated billable API calls.
+
+Why this was not production traffic
+1. The production mobile app does not call Google Places API; it reads from Supabase only.
+2. Billing spike timing matches offline batch enrichment execution (2026-09-12 19:10–19:16 UTC).
+3. Enrichment output aligns with high-volume Details + Photo calls (~2,685 Google photo URLs collected across 869 places).
+4. Billing report shows this as a new spike with no prior meaningful usage.
+
+Remediation already applied
+- Disabled Google Places calls by default (GOOGLE_PLACES_API_ENABLED=false)
+- Added explicit cost confirmation and hard call limits before any paid API usage
+- Skip re-processing when batch output already exists
+- Planning API key quota caps and budget alerts
+
+Request
+Please review a one-time billing credit for the KRW 105,761 Places API (New) charge on September 12, 2026.
+
+Thank you.

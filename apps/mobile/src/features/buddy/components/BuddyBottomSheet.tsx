@@ -1,9 +1,11 @@
+import { useRouter } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+
 import { AppText } from '@/src/components/ui';
 import { spacing } from '@/src/constants';
 import { BuddyListItem } from '@/src/features/buddy/components/BuddyListItem';
 import type { BuddyProfile } from '@/src/features/buddy/mock-data';
 import { MapBottomSheet } from '@/src/features/map/components/MapBottomSheet';
-import { StyleSheet, View } from 'react-native';
 
 type BuddyBottomSheetProps = {
   buddies: BuddyProfile[];
@@ -18,12 +20,19 @@ export function BuddyBottomSheet({
   onFilterChange,
   filters,
 }: BuddyBottomSheetProps) {
+  const router = useRouter();
+
   return (
     <MapBottomSheet
       title="주변 버디"
       data={buddies}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <BuddyListItem buddy={item} />}
+      renderItem={({ item }) => (
+        <BuddyListItem
+          buddy={item}
+          onPress={(buddy) => router.push(`/profile/${buddy.id}`)}
+        />
+      )}
       filters={filters}
       selectedFilterIndex={selectedFilterIndex}
       onFilterChange={onFilterChange}

@@ -73,6 +73,44 @@ pnpm fetch:all
 - API 호출 간 딜레이가 있어 전체 수집에 시간이 걸릴 수 있습니다.
 - Google Places / 네이버 / 카카오 이용약관 및 과금 정책을 확인하세요.
 
+## Google Places 과금 안전장치 (필독)
+
+**모든 맵/장소 외부 API는 기본 차단** (`MAP_API_ENABLED=false`).
+
+| API | 추가 플래그 |
+|-----|-------------|
+| Google Places | `GOOGLE_PLACES_API_ENABLED=true` + confirm |
+| Naver Local | `NAVER_LOCAL_API_ENABLED=true` |
+| Kakao Local | `KAKAO_LOCAL_API_ENABLED=true` |
+| Mapbox (앱) | `EXPO_PUBLIC_MAP_API_ENABLED=true` |
+
+`Scrum/scripts/enrich-places.ts`는 장소 1건당 **Place Details + (선택) Photo API**를 호출합니다.  
+전체 1,103건을 여러 번 재실행하면 **수만 원~10만 원 이상** 청구될 수 있습니다.
+
+기본값은 **Google Places 호출 차단**입니다 (`GOOGLE_PLACES_API_ENABLED=false`).
+
+유료 호출이 필요할 때만 아래를 설정하세요.
+
+```bash
+MAP_API_ENABLED=true
+GOOGLE_PLACES_API_ENABLED=true
+GOOGLE_PLACES_CONFIRM=I_ACCEPT_GOOGLE_PLACES_COST
+GOOGLE_PLACES_MAX_PLACES=25          # 한 번에 처리할 최대 장소 수
+GOOGLE_PLACES_MAX_PHOTOS_PER_PLACE=0 # 0이면 사진 API 미호출 (권장)
+GOOGLE_PLACES_MAX_BILLABLE_CALLS=100
+GOOGLE_PLACES_SKIP_EXISTING_BATCHES=true
+NAVER_LOCAL_API_ENABLED=false
+KAKAO_LOCAL_API_ENABLED=false
+```
+
+비용 미리보기:
+
+```bash
+GOOGLE_PLACES_DRY_RUN=true pnpm enrich:places
+```
+
+즉시 GCP에서도 **일일 quota / budget alert**를 설정하세요.
+
 ## 병합 · 정규화 · Supabase import
 
 수집된 API JSON을 병합·중복 제거·교차검증한 뒤 `places` 테이블로 import합니다.
