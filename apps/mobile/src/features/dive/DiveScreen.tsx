@@ -109,7 +109,7 @@ export default function DiveScreen() {
 
               {previousDives.length > 0 ? (
                 <FadeInView index={2}>
-                  <AppText variant="label" style={styles.previousHeader}>
+                  <AppText variant="bodySmall" style={styles.previousHeader}>
                     이전 기록
                   </AppText>
                   <View style={styles.previousList}>
@@ -190,8 +190,6 @@ const styles = StyleSheet.create({
   previousHeader: {
     color: colors.textSecondary,
     marginBottom: spacing.xs,
-    fontSize: 14,
-    lineHeight: 20,
   },
   previousList: {
     marginTop: spacing.xs,
@@ -204,7 +202,5 @@ const styles = StyleSheet.create({
   yearEmptyText: {
     color: colors.textSecondary,
     textAlign: 'center',
-    fontSize: 15,
-    lineHeight: 22,
   },
 });

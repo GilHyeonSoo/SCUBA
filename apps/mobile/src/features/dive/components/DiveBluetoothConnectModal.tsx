@@ -86,7 +86,7 @@ export function DiveBluetoothConnectModal({
             )}
           </View>
 
-          <AppText variant="h3" style={styles.title}>
+          <AppText variant="h2" style={styles.title}>
             {phase === 'connecting' ? '블루투스 연동 중' : '연동 완료'}
           </AppText>
           <AppText variant="bodySmall" style={styles.subtitle}>
@@ -154,14 +154,10 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    fontSize: 19,
-    lineHeight: 26,
   },
   subtitle: {
     textAlign: 'center',
     color: colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 22,
     marginBottom: spacing.sm,
   },
   confirmButton: {

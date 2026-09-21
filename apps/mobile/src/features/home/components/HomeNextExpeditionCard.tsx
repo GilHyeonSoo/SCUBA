@@ -52,7 +52,7 @@ export function HomeNextExpeditionCard({
                 DEPTH
               </AppText>
               <View style={styles.metricValueRow}>
-                <AppText variant="h2" style={styles.metricValue}>
+                <AppText variant="numeric" style={styles.metricValue}>
                   {depthLabel.replace(/m$/i, '')}
                 </AppText>
                 <AppText variant="label" style={styles.metricUnit}>
@@ -115,26 +115,17 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   spotTitle: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: -0.2,
   },
   spotMeta: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500',
     color: colors.textSecondary,
   },
   spotSchedule: {
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: '600',
     color: colors.textPrimary,
   },
   metricsColumn: {
-    width: 108,
+    width: 140,
     borderLeftWidth: 1,
     borderLeftColor: colors.divider,
     paddingLeft: spacing.md,
@@ -144,9 +135,6 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   metricLabel: {
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '800',
     letterSpacing: 0.6,
     color: colors.textTertiary,
   },
@@ -156,23 +144,14 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   metricValue: {
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: '800',
     color: colors.primary,
     letterSpacing: -0.8,
   },
   metricUnit: {
-    fontSize: 16,
-    lineHeight: 28,
-    fontWeight: '700',
     color: colors.primary,
     marginBottom: 2,
   },
   gasValue: {
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: '700',
     color: colors.primary,
   },
   metricDivider: {
@@ -194,9 +173,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   ctaText: {
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '700',
     color: colors.primary,
   },
 });

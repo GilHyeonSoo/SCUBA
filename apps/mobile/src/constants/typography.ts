@@ -3,6 +3,18 @@ import { TextStyle } from 'react-native';
 import { colors } from './colors';
 
 export const typography = {
+  numericHero: {
+    fontSize: 40,
+    fontWeight: '700',
+    lineHeight: 48,
+    color: colors.textPrimary,
+  },
+  numeric: {
+    fontSize: 32,
+    fontWeight: '800',
+    lineHeight: 40,
+    color: colors.textPrimary,
+  },
   display: {
     fontSize: 32,
     fontWeight: '700',
@@ -11,6 +23,12 @@ export const typography = {
     color: colors.textPrimary,
   },
   h1: {
+    fontSize: 24,
+    fontWeight: '700',
+    lineHeight: 32,
+    color: colors.textPrimary,
+  },
+  sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
     lineHeight: 32,

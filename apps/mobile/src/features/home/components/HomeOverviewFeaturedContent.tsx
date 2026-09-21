@@ -16,7 +16,7 @@ function StatCell({ label, value }: { label: string; value: string }) {
       <AppText variant="caption" style={styles.statLabel}>
         {label}
       </AppText>
-      <AppText variant="body" style={styles.statValue}>
+      <AppText variant="h3" style={styles.statValue}>
         {value}
       </AppText>
     </View>
@@ -30,10 +30,10 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
     return (
       <View style={styles.panelBody}>
         <View style={styles.panelHeader}>
-          <AppText variant="h3" style={styles.panelTitle}>
+          <AppText variant="sectionTitle" style={styles.panelTitle}>
             {panel.site}
           </AppText>
-          <AppText variant="bodySmall" style={styles.panelSubtitle}>
+          <AppText variant="body" style={styles.panelSubtitle}>
             {panel.date}
           </AppText>
         </View>
@@ -61,10 +61,10 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
     return (
       <View style={styles.panelBody}>
         <View style={styles.panelHeader}>
-          <AppText variant="h3" style={styles.panelTitle}>
+          <AppText variant="sectionTitle" style={styles.panelTitle}>
             {`${panel.count}명 근처`}
           </AppText>
-          <AppText variant="bodySmall" style={styles.panelSubtitle}>
+          <AppText variant="body" style={styles.panelSubtitle}>
             주변에서 활동 중인 다이버
           </AppText>
         </View>
@@ -75,13 +75,13 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
               key={buddy.id}
               style={[styles.listRow, index < panel.buddies.length - 1 && styles.listRowDivider]}>
               <View style={styles.listRowMain}>
-                <AppText variant="body" style={styles.listTitle}>
+                <AppText variant="h3" style={styles.listTitle}>
                   {buddy.nickname}
                 </AppText>
-                <AppText variant="caption" style={styles.listMeta}>
+                <AppText variant="bodySmall" style={styles.listMeta}>
                   {`${buddy.certification} · ${buddy.diveCount} dives · ${buddy.region}`}
                 </AppText>
-                <AppText variant="caption" style={styles.listStatus} numberOfLines={1}>
+                <AppText variant="bodySmall" style={styles.listStatus} numberOfLines={1}>
                   {buddy.status}
                 </AppText>
               </View>
@@ -98,10 +98,10 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
     return (
       <View style={styles.panelBody}>
         <View style={styles.panelHeader}>
-          <AppText variant="h3" style={styles.panelTitle}>
+          <AppText variant="sectionTitle" style={styles.panelTitle}>
             {maintenance ? '점검 필요' : '장비 상태 양호'}
           </AppText>
-          <AppText variant="bodySmall" style={styles.panelSubtitle}>
+          <AppText variant="body" style={styles.panelSubtitle}>
             {maintenance ? maintenance.equipmentName : '등록된 장비 점검 일정 없음'}
           </AppText>
         </View>
@@ -113,7 +113,7 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
                 {maintenance.status === 'due' ? '점검 예정' : '곧 점검'}
               </AppText>
             </View>
-            <AppText variant="bodySmall" style={styles.messageText}>
+            <AppText variant="body" style={styles.messageText}>
               {maintenance.message}
             </AppText>
             <View style={styles.progressTrack}>
@@ -121,7 +121,7 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
             </View>
           </>
         ) : (
-          <AppText variant="bodySmall" style={styles.messageText}>
+          <AppText variant="body" style={styles.messageText}>
             모든 등록 장비가 정상 범위입니다.
           </AppText>
         )}
@@ -134,10 +134,10 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
   return (
     <View style={styles.panelBody}>
       <View style={styles.panelHeader}>
-        <AppText variant="h3" style={styles.panelTitle}>
+        <AppText variant="sectionTitle" style={styles.panelTitle}>
           {panel.tour.title}
         </AppText>
-        <AppText variant="bodySmall" style={styles.panelSubtitle}>
+        <AppText variant="body" style={styles.panelSubtitle}>
           {`${panel.tour.location} · ${panel.tour.date}`}
         </AppText>
       </View>
@@ -151,7 +151,7 @@ export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedConte
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${fillRatio * 100}%` }]} />
       </View>
-      <AppText variant="caption" style={styles.progressCaption}>
+      <AppText variant="bodySmall" style={styles.progressCaption}>
         {panel.totalSeats - panel.filledSeats > 0
           ? `잔여 ${panel.totalSeats - panel.filledSeats}석`
           : '마감 임박'}
@@ -168,17 +168,11 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   panelTitle: {
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: -0.4,
   },
   panelSubtitle: {
-    fontSize: 16,
-    lineHeight: 22,
     color: colors.textSecondary,
-    fontWeight: '500',
   },
   statsRow: {
     flexDirection: 'row',
@@ -196,16 +190,10 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     color: colors.textTertiary,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '700',
     letterSpacing: 0.3,
   },
   statValue: {
     color: colors.textPrimary,
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: '800',
   },
   listBlock: {
     gap: 0,
@@ -221,21 +209,13 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   listTitle: {
-    fontSize: 17,
-    lineHeight: 22,
-    fontWeight: '700',
     color: colors.textPrimary,
   },
   listMeta: {
     color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
   },
   listStatus: {
     color: colors.primary,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '600',
   },
   statusPill: {
     alignSelf: 'flex-start',
@@ -247,14 +227,9 @@ const styles = StyleSheet.create({
   },
   statusPillText: {
     color: colors.warning,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '700',
   },
   messageText: {
     color: colors.textSecondary,
-    fontSize: 16,
-    lineHeight: 22,
   },
   progressTrack: {
     height: 4,
@@ -269,12 +244,8 @@ const styles = StyleSheet.create({
   },
   progressCaption: {
     color: colors.textTertiary,
-    fontSize: 14,
-    lineHeight: 18,
   },
   emptyNote: {
     color: colors.textTertiary,
-    fontSize: 15,
-    lineHeight: 20,
   },
 });

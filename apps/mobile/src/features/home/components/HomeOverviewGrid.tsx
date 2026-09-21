@@ -35,7 +35,7 @@ function CompactTileContent({ tile }: { tile: HomeOverviewTile }) {
       </View>
       {showSplitValue ? (
         <View style={styles.valueRow}>
-          <AppText variant="h2" style={styles.compactValueNumber}>
+          <AppText variant="numeric" style={styles.compactValueNumber}>
             {tile.value}
           </AppText>
           <AppText variant="label" style={styles.compactValueUnit}>
@@ -80,7 +80,7 @@ export function HomeOverviewGrid({ tiles, defaultFeaturedId }: HomeOverviewGridP
   return (
     <View style={styles.panel}>
       <View style={styles.featuredHeader}>
-        <AppText variant="caption" style={styles.featuredHeaderLabel}>
+        <AppText variant="label" style={styles.featuredHeaderLabel}>
           {featuredTile.label}
         </AppText>
       </View>
@@ -131,9 +131,6 @@ const styles = StyleSheet.create({
   },
   featuredHeaderLabel: {
     color: colors.primary,
-    fontSize: 14,
-    lineHeight: 18,
-    fontWeight: '800',
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
@@ -155,11 +152,11 @@ const styles = StyleSheet.create({
   },
   compactTile: {
     flex: 1,
-    minHeight: 112,
+    minHeight: 136,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.md,
     gap: spacing.xs,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.primary,
     borderRadius: radius.md,
     backgroundColor: colors.background,
@@ -167,7 +164,6 @@ const styles = StyleSheet.create({
   compactTilePressed: {
     opacity: 0.88,
     borderColor: colors.primaryStrong,
-    borderWidth: 2,
   },
   compactTopRow: {
     flexDirection: 'row',
@@ -177,48 +173,30 @@ const styles = StyleSheet.create({
   },
   compactLabel: {
     color: colors.primary,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '800',
     letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
   valueRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 2,
+    gap: spacing.xs,
   },
   compactValueNumber: {
-    fontSize: 26,
-    lineHeight: 32,
-    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: -0.5,
   },
   compactValueUnit: {
-    fontSize: 15,
-    lineHeight: 26,
-    fontWeight: '700',
     color: colors.textSecondary,
     marginBottom: 1,
   },
   compactValueText: {
-    fontSize: 20,
-    lineHeight: 26,
-    fontWeight: '700',
     color: colors.textPrimary,
   },
   compactHint: {
     color: colors.textSecondary,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '500',
   },
   compactTapHint: {
     color: colors.primary,
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '700',
     marginTop: spacing.xs,
   },
 });

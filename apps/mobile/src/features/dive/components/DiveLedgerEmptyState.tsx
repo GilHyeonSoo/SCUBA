@@ -22,7 +22,7 @@ export function DiveLedgerEmptyState({
 }: DiveLedgerEmptyStateProps) {
   return (
     <View style={styles.container}>
-      <AppText variant="h3" style={styles.title}>
+      <AppText variant="h2" style={styles.title}>
         아직 다이빙 기록이 없습니다
       </AppText>
       <AppText variant="bodySmall" style={styles.subtitle}>
@@ -60,15 +60,11 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    fontSize: 19,
-    lineHeight: 26,
   },
   subtitle: {
     textAlign: 'center',
     color: colors.textSecondary,
     paddingHorizontal: spacing.md,
-    fontSize: 15,
-    lineHeight: 22,
   },
   actions: {
     width: '100%',

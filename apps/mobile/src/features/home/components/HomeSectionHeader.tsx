@@ -12,7 +12,7 @@ export function HomeSectionHeader({ title, marginTop = spacing.xl }: HomeSection
   return (
     <View style={[styles.container, { marginTop }]}>
       <View style={styles.accent} />
-      <AppText variant="caption" style={styles.title}>
+      <AppText variant="label" style={styles.title}>
         {title}
       </AppText>
     </View>
@@ -35,9 +35,6 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.textPrimary,
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '800',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },

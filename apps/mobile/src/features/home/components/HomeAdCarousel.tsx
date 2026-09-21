@@ -18,7 +18,6 @@ import { colors, layout, spacing } from '@/src/constants';
 import type { HomeAdBanner } from '@/src/features/home/mock-data';
 
 const AUTO_SLIDE_MS = 4500;
-const SLIDE_HEIGHT = 240;
 const SEGMENT_TRACK_WIDTH = 40;
 const SEGMENT_HEIGHT = 4;
 
@@ -143,10 +142,10 @@ export function HomeAdCarousel({ banners, style, edgeToEdge = false }: HomeAdCar
                       {item.badge}
                     </AppText>
                   ) : null}
-                  <AppText variant="h3" style={styles.title} numberOfLines={2}>
+                  <AppText variant="h3" style={styles.title} numberOfLines={1}>
                     {item.title}
                   </AppText>
-                  <AppText variant="bodySmall" style={styles.subtitle} numberOfLines={2}>
+                  <AppText variant="bodySmall" style={styles.subtitle} numberOfLines={1}>
                     {item.subtitle}
                   </AppText>
                   <View style={styles.overlayFooter}>
@@ -190,7 +189,8 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   slide: {
-    height: SLIDE_HEIGHT,
+    width: '100%',
+    aspectRatio: 1.618,
     overflow: 'hidden',
     backgroundColor: colors.surface,
     position: 'relative',
@@ -211,9 +211,6 @@ const styles = StyleSheet.create({
   },
   adLabelText: {
     color: colors.white,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '700',
     letterSpacing: 0.4,
   },
   overlay: {
@@ -221,31 +218,23 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    maxHeight: 96,
     backgroundColor: 'rgba(4, 18, 36, 0.72)',
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.lg,
+    paddingVertical: spacing.xs,
   },
   overlayContent: {
-    gap: spacing.xs,
+    gap: 0,
   },
   badge: {
     color: 'rgba(255, 255, 255, 0.88)',
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '600',
   },
   title: {
     color: colors.textOnPrimary,
     letterSpacing: -0.3,
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: '700',
   },
   subtitle: {
     color: 'rgba(255, 255, 255, 0.85)',
-    fontSize: 14,
-    lineHeight: 20,
   },
   overlayFooter: {
     flexDirection: 'row',
@@ -257,14 +246,9 @@ const styles = StyleSheet.create({
   sponsor: {
     flex: 1,
     color: 'rgba(255, 255, 255, 0.72)',
-    fontSize: 12,
-    lineHeight: 16,
   },
   cta: {
     color: colors.textOnPrimary,
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: '700',
   },
   segmentWrap: {
     position: 'absolute',

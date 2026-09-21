@@ -45,7 +45,7 @@ export function HomeUpcomingTourCard({
         ) : null}
       </View>
 
-      <AppText variant="body" style={styles.title} numberOfLines={2}>
+      <AppText variant="h3" style={styles.title} numberOfLines={2}>
         {title}
       </AppText>
 
@@ -84,9 +84,6 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   eyebrow: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '800',
     letterSpacing: 0.8,
     color: colors.textSecondary,
   },
@@ -98,30 +95,18 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   officialText: {
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '700',
     color: colors.primary,
   },
   title: {
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: '700',
     color: colors.textPrimary,
   },
   footerRow: {
     gap: 2,
   },
   meta: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500',
     color: colors.textSecondary,
   },
   metaStrong: {
-    fontSize: 15,
-    lineHeight: 21,
-    fontWeight: '600',
     color: colors.textPrimary,
   },
 });

@@ -56,12 +56,12 @@ export default function HomeScreen() {
               )}
             </View>
             <View style={styles.greetingTextBlock}>
-              <AppText variant="h2" style={styles.greeting}>
+              <AppText variant="sectionTitle" style={styles.greeting}>
                 {greeting}
               </AppText>
               <View style={styles.locationRow}>
                 <Ionicons name="location-outline" size={15} color={colors.textSecondary} />
-                <AppText variant="caption" style={styles.locationText}>
+                <AppText variant="bodySmall" style={styles.locationText}>
                   {`${data.region}, ${data.country}`}
                 </AppText>
               </View>
@@ -99,7 +99,7 @@ export default function HomeScreen() {
       </FadeInView>
 
       <FadeInView index={2}>
-        <HomeSectionHeader title="Overview" marginTop={spacing['2xl']} />
+        <HomeSectionHeader title="Overview" marginTop={spacing['3xl']} />
         <View style={styles.fullBleed}>
           <HomeOverviewGrid
             defaultFeaturedId="recent-log"
@@ -207,9 +207,6 @@ const styles = StyleSheet.create({
   },
   greeting: {
     letterSpacing: -0.5,
-    lineHeight: 32,
-    fontSize: 24,
-    fontWeight: '700',
     color: colors.textPrimary,
   },
   locationRow: {
@@ -219,8 +216,5 @@ const styles = StyleSheet.create({
   },
   locationText: {
     color: colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 21,
-    fontWeight: '500',
   },
 });

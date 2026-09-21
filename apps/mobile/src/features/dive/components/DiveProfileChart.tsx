@@ -7,7 +7,7 @@ import type { DiveProfileSample } from '@/src/features/dive-log/types';
 import { canRenderProfile, downsampleProfile } from '@/src/features/dive/utils/dive-ledger';
 
 const INLINE_CHART_HEIGHT = 72;
-const FEATURED_CHART_HEIGHT = 96;
+const FEATURED_CHART_HEIGHT = 104;
 const TARGET_SAMPLES = 48;
 const LINE_THICKNESS = 2;
 const AXIS_LABEL_WIDTH = 36;

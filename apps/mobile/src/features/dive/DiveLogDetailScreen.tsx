@@ -28,10 +28,10 @@ type MetricProps = {
 function Metric({ label, value, divided = false }: MetricProps) {
   return (
     <View style={[styles.metric, divided && styles.metricDivided]}>
-      <AppText variant="caption" style={styles.metricLabel}>
+      <AppText variant="label" style={styles.metricLabel}>
         {label}
       </AppText>
-      <AppText variant="body" style={styles.metricValue}>
+      <AppText variant="h3" style={styles.metricValue}>
         {value}
       </AppText>
     </View>
@@ -90,7 +90,7 @@ export default function DiveLogDetailScreen() {
         {backButton}
         <ScreenLayout contentTopSpacing={spacing.lg} contentContainerStyle={styles.content}>
           <View style={styles.notFound}>
-            <AppText variant="h3" style={styles.notFoundTitle}>
+            <AppText variant="h2" style={styles.notFoundTitle}>
               다이빙 로그를 찾을 수 없습니다
             </AppText>
             <AppText variant="bodySmall" style={styles.notFoundDescription}>
@@ -122,15 +122,17 @@ export default function DiveLogDetailScreen() {
           </AppText>
 
           <View style={styles.depthBlock}>
-            <AppText variant="caption" style={styles.depthLabel}>
+            <AppText variant="bodySmall" style={styles.depthLabel}>
               최대 수심
             </AppText>
-            <AppText style={styles.depthValue}>{formatDepthMeters(dive.maxDepthM)}</AppText>
+            <AppText variant="numericHero" style={styles.depthValue}>
+              {formatDepthMeters(dive.maxDepthM)}
+            </AppText>
           </View>
         </View>
 
         <View style={styles.profileSection}>
-          <AppText variant="h3" style={styles.sectionTitle}>
+          <AppText variant="h3">
             다이브 프로파일
           </AppText>
           {hasProfile ? (
@@ -154,7 +156,7 @@ export default function DiveLogDetailScreen() {
         </View>
 
         <View style={styles.sourceSection}>
-          <AppText variant="h3" style={styles.sectionTitle}>
+          <AppText variant="h3">
             로그 정보
           </AppText>
           <View style={styles.sourceList}>
@@ -197,14 +199,10 @@ const styles = StyleSheet.create({
   },
   notFoundTitle: {
     textAlign: 'center',
-    fontSize: 19,
-    lineHeight: 26,
   },
   notFoundDescription: {
     color: colors.textSecondary,
     textAlign: 'center',
-    fontSize: 15,
-    lineHeight: 22,
   },
   hero: {
     gap: spacing.xs,
@@ -214,18 +212,12 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     color: colors.primaryStrong,
-    fontSize: 14,
-    lineHeight: 20,
   },
   date: {
-    fontSize: 22,
-    lineHeight: 30,
     letterSpacing: -0.3,
   },
   deviceLabel: {
     color: colors.textSecondary,
-    fontSize: 16,
-    lineHeight: 23,
   },
   depthBlock: {
     gap: spacing.xs,
@@ -233,27 +225,16 @@ const styles = StyleSheet.create({
   },
   depthLabel: {
     color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
   },
   depthValue: {
     color: colors.primaryStrong,
-    fontSize: 48,
-    fontWeight: '700',
-    lineHeight: 54,
     letterSpacing: -1.2,
   },
   profileSection: {
     gap: spacing.md,
   },
-  sectionTitle: {
-    fontSize: 18,
-    lineHeight: 25,
-  },
   profileEmpty: {
     color: colors.textTertiary,
-    fontSize: 15,
-    lineHeight: 22,
     paddingVertical: spacing.xl,
   },
   metrics: {
@@ -282,14 +263,9 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
   },
   metricValue: {
     color: colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '600',
-    lineHeight: 24,
   },
   sourceSection: {
     gap: spacing.md,
@@ -309,15 +285,10 @@ const styles = StyleSheet.create({
   },
   sourceLabel: {
     color: colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 21,
   },
   sourceValue: {
     flex: 1,
     color: colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '500',
-    lineHeight: 22,
     textAlign: 'right',
   },
 });
