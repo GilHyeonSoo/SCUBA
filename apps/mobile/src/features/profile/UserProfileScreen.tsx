@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { ScreenLayout } from '@/src/components/layout/ScreenLayout';
 import { AppHeader, AppText } from '@/src/components/ui';
@@ -53,7 +53,7 @@ export default function UserProfileScreen() {
 
   const followingIds = useFollowStore((state) => state.followingIds);
   const isFollowingTarget = useFollowStore((state) =>
-    resolvedUserId ? state.isFollowing(resolvedUserId) : false,
+    resolvedUserId ? state.followingIds.has(resolvedUserId) : false,
   );
   const currentUserName = useProfileStore((state) => state.profile.displayName);
 
@@ -73,6 +73,27 @@ export default function UserProfileScreen() {
   }, []);
 
   const isLoading = useRemote && (isProfileLoading || isGalleryLoading);
+
+  const stats = useMemo(() => {
+    if (!user) {
+      return { posts: 0, followers: 0, following: 0 };
+    }
+
+    if (remoteFollowStats) {
+      return {
+        posts: remoteFollowStats.postCount,
+        followers: remoteFollowStats.followerCount,
+        following: remoteFollowStats.followingCount,
+      };
+    }
+
+    const followStore = useFollowStore.getState();
+    return {
+      posts: galleryImages.length,
+      followers: followStore.getFollowerCount(user.id),
+      following: followStore.getFollowingCount(user.id),
+    };
+  }, [galleryImages.length, user, followingIds, isFollowingTarget, remoteFollowStats]);
 
   if (isLoading) {
     return (
@@ -101,23 +122,6 @@ export default function UserProfileScreen() {
   const isSelf =
     user.id === CURRENT_USER_ID ||
     (currentUserId != null && user.id === currentUserId);
-
-  const stats = useMemo(() => {
-    if (remoteFollowStats) {
-      return {
-        posts: remoteFollowStats.postCount,
-        followers: remoteFollowStats.followerCount,
-        following: remoteFollowStats.followingCount,
-      };
-    }
-
-    const followStore = useFollowStore.getState();
-    return {
-      posts: galleryImages.length,
-      followers: followStore.getFollowerCount(user.id),
-      following: followStore.getFollowingCount(user.id),
-    };
-  }, [galleryImages.length, user.id, followingIds, isFollowingTarget, remoteFollowStats]);
 
   return (
     <ScreenLayout

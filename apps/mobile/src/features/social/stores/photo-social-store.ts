@@ -30,6 +30,8 @@ function baseLikeCount(photoId: string): number {
   return seedLikeCounts.default + (hash % 8);
 }
 
+const EMPTY_COMMENTS: PhotoComment[] = [];
+
 const seedComments: Record<string, PhotoComment[]> = {
   seed: [
     {
@@ -67,7 +69,7 @@ export const usePhotoSocialStore = create<PhotoSocialStoreState>((set, get) => (
     return get().isLiked(photoId) ? base + 1 : base;
   },
 
-  getComments: (photoId) => get().commentsByPhotoId[photoId] ?? [],
+  getComments: (photoId) => get().commentsByPhotoId[photoId] ?? EMPTY_COMMENTS,
 
   addComment: (photoId, body, userDisplayName = '다이버') => {
     const trimmed = body.trim();

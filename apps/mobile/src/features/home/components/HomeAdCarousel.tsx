@@ -1,8 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
-  ImageBackground,
+  Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Pressable,
@@ -15,21 +14,24 @@ import {
 } from 'react-native';
 
 import { AppText } from '@/src/components/ui';
-import { colors, layout, radius, shadows, spacing } from '@/src/constants';
+import { colors, layout, spacing } from '@/src/constants';
 import type { HomeAdBanner } from '@/src/features/home/mock-data';
 
 const AUTO_SLIDE_MS = 4500;
-const SLIDE_HEIGHT = 184;
+const SLIDE_HEIGHT = 240;
+const SEGMENT_TRACK_WIDTH = 40;
+const SEGMENT_HEIGHT = 4;
 
 type HomeAdCarouselProps = {
   banners: HomeAdBanner[];
   style?: StyleProp<ViewStyle>;
+  edgeToEdge?: boolean;
 };
 
-export function HomeAdCarousel({ banners, style }: HomeAdCarouselProps) {
+export function HomeAdCarousel({ banners, style, edgeToEdge = false }: HomeAdCarouselProps) {
   const { width: windowWidth } = useWindowDimensions();
   const contentWidth = Math.min(windowWidth, layout.mobileWebMaxWidth);
-  const slideWidth = contentWidth - layout.screenPaddingHorizontal * 2;
+  const slideWidth = edgeToEdge ? contentWidth : contentWidth - layout.screenPaddingHorizontal * 2;
 
   const listRef = useRef<FlatList<HomeAdBanner>>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -86,6 +88,8 @@ export function HomeAdCarousel({ banners, style }: HomeAdCarouselProps) {
     return null;
   }
 
+  const segmentWidth = banners.length > 0 ? SEGMENT_TRACK_WIDTH / banners.length : 0;
+
   return (
     <View style={[styles.container, style]}>
       <FlatList
@@ -118,76 +122,63 @@ export function HomeAdCarousel({ banners, style }: HomeAdCarouselProps) {
             onPress={() => {
               // Placeholder until ad destinations are wired.
             }}>
-            <ImageBackground
-              source={{ uri: item.imageUri }}
-              style={[styles.slide, shadows.md]}
-              imageStyle={styles.slideImage}
-              resizeMode="cover"
-              accessibilityIgnoresInvertColors>
-              <LinearGradient
-                colors={[...item.gradient]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <LinearGradient
-                colors={['rgba(0,0,0,0.45)', 'transparent']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 0.55 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <LinearGradient
-                colors={['transparent', 'rgba(4,18,36,0.92)']}
-                locations={[0.35, 1]}
-                style={StyleSheet.absoluteFill}
+            <View style={styles.slide}>
+              <Image
+                source={{ uri: item.imageUri }}
+                style={styles.image}
+                resizeMode="cover"
+                accessibilityIgnoresInvertColors
               />
 
-              <View style={styles.topRow}>
-                <View style={styles.adLabel}>
-                  <AppText variant="caption" style={styles.adLabelText}>
-                    광고
-                  </AppText>
-                </View>
-                <AppText variant="caption" style={styles.sponsorText} numberOfLines={1}>
-                  {item.sponsor}
+              <View style={styles.adLabel}>
+                <AppText variant="caption" style={styles.adLabelText}>
+                  광고
                 </AppText>
               </View>
 
-              <View style={styles.content}>
-                {item.badge ? (
-                  <View style={styles.badge}>
-                    <AppText variant="caption" style={styles.badgeText}>
+              <View style={styles.overlay}>
+                <View style={styles.overlayContent}>
+                  {item.badge ? (
+                    <AppText variant="caption" style={styles.badge}>
                       {item.badge}
                     </AppText>
-                  </View>
-                ) : null}
-                <AppText variant="h3" style={styles.title} numberOfLines={2}>
-                  {item.title}
-                </AppText>
-                <AppText variant="bodySmall" style={styles.subtitle} numberOfLines={2}>
-                  {item.subtitle}
-                </AppText>
-                {item.cta ? (
-                  <View style={styles.ctaPill}>
-                    <AppText variant="label" style={styles.ctaText}>
-                      {item.cta}
+                  ) : null}
+                  <AppText variant="h3" style={styles.title} numberOfLines={2}>
+                    {item.title}
+                  </AppText>
+                  <AppText variant="bodySmall" style={styles.subtitle} numberOfLines={2}>
+                    {item.subtitle}
+                  </AppText>
+                  <View style={styles.overlayFooter}>
+                    <AppText variant="caption" style={styles.sponsor} numberOfLines={1}>
+                      {item.sponsor}
                     </AppText>
+                    {item.cta ? (
+                      <AppText variant="label" style={styles.cta}>
+                        {item.cta}
+                      </AppText>
+                    ) : null}
                   </View>
-                ) : null}
+                </View>
               </View>
-            </ImageBackground>
+            </View>
           </Pressable>
         )}
       />
 
       {banners.length > 1 ? (
-        <View style={styles.dots}>
-          {banners.map((banner, index) => (
+        <View style={styles.segmentWrap}>
+          <View style={styles.segmentTrack}>
             <View
-              key={banner.id}
-              style={[styles.dot, index === activeIndex && styles.dotActive]}
+              style={[
+                styles.segmentFill,
+                {
+                  width: segmentWidth,
+                  transform: [{ translateX: activeIndex * segmentWidth }],
+                },
+              ]}
             />
-          ))}
+          </View>
         </View>
       ) : null}
     </View>
@@ -196,99 +187,103 @@ export function HomeAdCarousel({ banners, style }: HomeAdCarouselProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: spacing.lg,
+    marginTop: 0,
   },
   slide: {
-    borderRadius: radius.xl,
-    overflow: 'hidden',
     height: SLIDE_HEIGHT,
-    justifyContent: 'space-between',
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+    position: 'relative',
   },
-  slideImage: {
-    borderRadius: radius.xl,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    gap: spacing.sm,
-    zIndex: 1,
+  image: {
+    width: '100%',
+    height: '100%',
   },
   adLabel: {
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    position: 'absolute',
+    top: spacing.sm,
+    left: spacing.sm,
+    backgroundColor: 'rgba(16, 24, 40, 0.72)',
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    borderRadius: radius.sm,
+    borderRadius: 4,
+    zIndex: 2,
   },
   adLabelText: {
-    color: colors.textSecondary,
+    color: colors.white,
     fontSize: 10,
     lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 0.4,
   },
-  sponsorText: {
-    flex: 1,
-    textAlign: 'right',
-    color: 'rgba(255,255,255,0.88)',
-    fontWeight: '500',
-  },
-  content: {
+  overlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(4, 18, 36, 0.72)',
     paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
     paddingBottom: spacing.lg,
+  },
+  overlayContent: {
     gap: spacing.xs,
-    zIndex: 1,
   },
   badge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.full,
-    marginBottom: spacing.xs,
-  },
-  badgeText: {
-    color: colors.textOnPrimary,
+    color: 'rgba(255, 255, 255, 0.88)',
+    fontSize: 11,
+    lineHeight: 14,
     fontWeight: '600',
   },
   title: {
     color: colors.textOnPrimary,
     letterSpacing: -0.3,
-  },
-  subtitle: {
-    color: 'rgba(255,255,255,0.85)',
-  },
-  ctaPill: {
-    alignSelf: 'flex-start',
-    marginTop: spacing.sm,
-    backgroundColor: colors.textOnPrimary,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.full,
-  },
-  ctaText: {
-    color: colors.primaryStrong,
+    fontSize: 18,
+    lineHeight: 24,
     fontWeight: '700',
   },
-  dots: {
+  subtitle: {
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  overlayFooter: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.md,
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    marginTop: spacing.xs,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.divider,
+  sponsor: {
+    flex: 1,
+    color: 'rgba(255, 255, 255, 0.72)',
+    fontSize: 12,
+    lineHeight: 16,
   },
-  dotActive: {
-    width: 18,
-    backgroundColor: colors.primary,
+  cta: {
+    color: colors.textOnPrimary,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '700',
+  },
+  segmentWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: spacing.sm,
+    alignItems: 'center',
+    pointerEvents: 'none',
+  },
+  segmentTrack: {
+    width: SEGMENT_TRACK_WIDTH,
+    height: SEGMENT_HEIGHT,
+    borderRadius: SEGMENT_HEIGHT / 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    overflow: 'hidden',
+  },
+  segmentFill: {
+    height: SEGMENT_HEIGHT,
+    borderRadius: SEGMENT_HEIGHT / 2,
+    backgroundColor: colors.white,
   },
 });

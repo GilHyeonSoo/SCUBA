@@ -17,7 +17,6 @@ export function usePhotoSocialState(photoIds: string[]) {
   const localCommentsByPhotoId = usePhotoSocialStore((state) => state.commentsByPhotoId);
   const localToggleLike = usePhotoSocialStore((state) => state.toggleLike);
   const localGetLikeCount = usePhotoSocialStore((state) => state.getLikeCount);
-  const localGetComments = usePhotoSocialStore((state) => state.getComments);
   const localAddComment = usePhotoSocialStore((state) => state.addComment);
 
   const summariesQuery = usePhotoSocialSummariesRemote(photoIds);
@@ -74,24 +73,25 @@ export function usePhotoSocialState(photoIds: string[]) {
     getLikeCount,
     getCommentCount,
     toggleLike,
-    localGetComments,
     localAddComment,
     summariesQuery,
   };
 }
 
+const EMPTY_COMMENTS: PhotoComment[] = [];
+
 export function usePhotoCommentsState(photoId: string | null, authorDisplayName: string) {
   const { isRemoteSocialEnabled } = useSupabaseAuth();
-  const localGetComments = usePhotoSocialStore((state) => state.getComments);
+  const localComments = usePhotoSocialStore((state) =>
+    photoId ? (state.commentsByPhotoId[photoId] ?? EMPTY_COMMENTS) : EMPTY_COMMENTS,
+  );
   const localAddComment = usePhotoSocialStore((state) => state.addComment);
   const commentsQuery = usePhotoCommentsRemote(photoId);
   const addCommentRemote = useAddPhotoCommentRemote();
 
   const comments: PhotoComment[] = isRemoteSocialEnabled
-    ? (commentsQuery.data ?? [])
-    : photoId
-      ? localGetComments(photoId)
-      : [];
+    ? (commentsQuery.data ?? EMPTY_COMMENTS)
+    : localComments;
 
   const addComment = useCallback(
     (body: string) => {

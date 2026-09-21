@@ -13,12 +13,14 @@ type CollapsibleChromeHeaderProps = {
   children: ReactNode;
   headerHeight: number;
   onHeightChange: (height: number) => void;
+  showShadow?: boolean;
 };
 
 export function CollapsibleChromeHeader({
   children,
   headerHeight,
   onHeightChange,
+  showShadow = true,
 }: CollapsibleChromeHeaderProps) {
   const chromeVisible = useScrollChromeStore((s) => s.chromeVisible);
   const translateY = useSharedValue(0);
@@ -46,7 +48,11 @@ export function CollapsibleChromeHeader({
   return (
     <Animated.View
       onLayout={handleLayout}
-      style={[styles.container, animatedStyle, shadows.sm]}
+      style={[
+        styles.container,
+        animatedStyle,
+        showShadow ? styles.withShadow : styles.flat,
+      ]}
       pointerEvents={chromeVisible ? 'auto' : 'none'}>
       {children}
     </Animated.View>
@@ -61,7 +67,13 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 20,
     backgroundColor: colors.background,
-    borderBottomWidth: 1,
+  },
+  withShadow: {
+    ...shadows.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.borderLight,
+  },
+  flat: {
+    borderBottomWidth: 0,
   },
 });

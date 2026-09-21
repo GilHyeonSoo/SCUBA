@@ -117,6 +117,11 @@ export function ProfilePhotoFeedViewer({
   const { isLiked, getLikeCount, getCommentCount, toggleLike, summariesQuery } =
     usePhotoSocialState(photoIds);
 
+  const listExtraData = useMemo(
+    () => ({ socialSummaries: summariesQuery.data, activeIndex }),
+    [activeIndex, summariesQuery.data],
+  );
+
   const activeImage = images[activeIndex] ?? null;
 
   const handleDelete = useCallback(() => {
@@ -184,7 +189,7 @@ export function ProfilePhotoFeedViewer({
       <View style={styles.container}>
         <FlatList
           data={images}
-          extraData={{ socialSummaries: summariesQuery.data, activeIndex }}
+          extraData={listExtraData}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           pagingEnabled

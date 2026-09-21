@@ -19,7 +19,7 @@ export function FollowButton({ userId, size = 'md' }: FollowButtonProps) {
   const { isRemoteSocialEnabled } = useSupabaseAuth();
   const useRemote = isRemoteSocialEnabled && !isMockSocialUserId(userId);
 
-  const localIsFollowing = useFollowStore((state) => state.isFollowing(userId));
+  const localIsFollowing = useFollowStore((state) => state.followingIds.has(userId));
   const toggleFollowLocal = useFollowStore((state) => state.toggleFollow);
 
   const { data: remoteIsFollowing } = useIsFollowingRemote(useRemote ? userId : null);

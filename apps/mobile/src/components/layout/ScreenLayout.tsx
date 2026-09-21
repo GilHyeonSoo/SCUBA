@@ -21,6 +21,8 @@ type ScreenLayoutProps = {
   scrollable?: boolean;
   /** When scrollable, allow toggling scroll without swapping the container. */
   scrollEnabled?: boolean;
+  /** Show drop shadow under the collapsible header. */
+  headerShadow?: boolean;
 };
 
 export function ScreenLayout({
@@ -31,6 +33,7 @@ export function ScreenLayout({
   withTabBarInset = true,
   scrollable = true,
   scrollEnabled = true,
+  headerShadow = true,
 }: ScreenLayoutProps) {
   const insets = useSafeAreaInsets();
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -66,7 +69,10 @@ export function ScreenLayout({
   return (
     <View style={styles.container}>
       {header ? (
-        <CollapsibleChromeHeader headerHeight={headerHeight} onHeightChange={setHeaderHeight}>
+        <CollapsibleChromeHeader
+          headerHeight={headerHeight}
+          onHeightChange={setHeaderHeight}
+          showShadow={headerShadow}>
           {header}
         </CollapsibleChromeHeader>
       ) : null}

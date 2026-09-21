@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FadeInView } from '@/src/components/motion';
@@ -14,6 +14,8 @@ import { colors, getTabBarChromeHeight, spacing } from '@/src/constants';
 import { DiveImportSheet } from '@/src/features/dive-log/components/DiveImportSheet';
 import { useDiveImport } from '@/src/features/dive-log/hooks/useDiveImport';
 import { useDiveLogStore } from '@/src/features/dive-log/stores/dive-log-store';
+import { DiveAddOptionsFabPanel } from '@/src/features/dive/components/DiveAddOptionsFabPanel';
+import { DiveBluetoothConnectModal } from '@/src/features/dive/components/DiveBluetoothConnectModal';
 import { DiveLatestSection } from '@/src/features/dive/components/DiveLatestSection';
 import { DiveLedgerEmptyState } from '@/src/features/dive/components/DiveLedgerEmptyState';
 import { DivePreviousLogItem } from '@/src/features/dive/components/DivePreviousLogItem';
@@ -33,6 +35,9 @@ export default function DiveScreen() {
   const lastImportedAt = useDiveLogStore((state) => state.lastImportedAt);
   const { isImporting, isSheetVisible, openImportSheet, closeImportSheet, pickAndImport } =
     useDiveImport();
+
+  const [addOptionsExpanded, setAddOptionsExpanded] = useState(false);
+  const [bluetoothModalVisible, setBluetoothModalVisible] = useState(false);
 
   const currentYear = new Date().getFullYear();
   const availableYears = useMemo(() => getAvailableYears(dives, currentYear), [dives, currentYear]);
@@ -55,21 +60,27 @@ export default function DiveScreen() {
 
   const scrollBottomInset = getTabBarChromeHeight(insets.bottom) + FAB_CHROME_HEIGHT;
 
-  const handleRecordPress = () => {
-    Alert.alert('준비 중', '수동 다이빙 기록 화면은 다음 단계에서 연결됩니다.');
-  };
-
   const handleDetailPress = (diveId: string) => {
     router.push(`/(tabs)/dive/${diveId}`);
   };
 
-  const showAddActions = () => {
-    Alert.alert('기록 추가', undefined, [
-      { text: '직접 기록', onPress: handleRecordPress },
-      { text: '파일에서 가져오기', onPress: openImportSheet },
-      { text: '취소', style: 'cancel' },
-    ]);
-  };
+  const toggleAddOptions = useCallback(() => {
+    setAddOptionsExpanded((current) => !current);
+  }, []);
+
+  const collapseAddOptions = useCallback(() => {
+    setAddOptionsExpanded(false);
+  }, []);
+
+  const handleBluetoothPress = useCallback(() => {
+    collapseAddOptions();
+    setBluetoothModalVisible(true);
+  }, [collapseAddOptions]);
+
+  const handleImportPress = useCallback(() => {
+    collapseAddOptions();
+    openImportSheet();
+  }, [collapseAddOptions, openImportSheet]);
 
   const hasLogs = dives.length > 0;
   const hasYearLogs = yearDives.length > 0;
@@ -127,20 +138,31 @@ export default function DiveScreen() {
           <FadeInView index={1}>
             <DiveLedgerEmptyState
               isImporting={isImporting}
-              onImportPress={openImportSheet}
-              onRecordPress={handleRecordPress}
+              optionsExpanded={addOptionsExpanded}
+              onToggleOptions={toggleAddOptions}
+              onBluetoothPress={handleBluetoothPress}
+              onImportPress={handleImportPress}
             />
           </FadeInView>
         )}
       </ScreenLayout>
 
       {hasLogs ? (
-        <CollapsibleActionFab
-          label="기록 추가"
-          accessibilityLabel="기록 추가"
-          labelWidth={68}
-          onPress={showAddActions}
-        />
+        <>
+          <DiveAddOptionsFabPanel
+            visible={addOptionsExpanded}
+            isImporting={isImporting}
+            onBluetoothPress={handleBluetoothPress}
+            onImportPress={handleImportPress}
+            onDismiss={collapseAddOptions}
+          />
+          <CollapsibleActionFab
+            label="기록 추가"
+            accessibilityLabel="기록 추가"
+            labelWidth={68}
+            onPress={toggleAddOptions}
+          />
+        </>
       ) : null}
 
       <DiveImportSheet
@@ -148,6 +170,11 @@ export default function DiveScreen() {
         isImporting={isImporting}
         onClose={closeImportSheet}
         onPickFile={(format) => void pickAndImport(format)}
+      />
+
+      <DiveBluetoothConnectModal
+        visible={bluetoothModalVisible}
+        onClose={() => setBluetoothModalVisible(false)}
       />
     </View>
   );
