@@ -46,7 +46,9 @@ export function ProfileStatsRow({
   return (
     <View style={styles.row}>
       <StatItem label="게시물" value={postCount} onPress={onPostsPress} />
+      <View style={styles.statDivider} />
       <StatItem label="팔로워" value={followerCount} onPress={onFollowersPress} />
+      <View style={styles.statDivider} />
       <StatItem label="팔로잉" value={followingCount} onPress={onFollowingPress} />
     </View>
   );
@@ -55,10 +57,15 @@ export function ProfileStatsRow({
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: spacing.md,
+    alignItems: 'stretch',
+    paddingVertical: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.divider,
+    borderBottomColor: colors.border,
+  },
+  statDivider: {
+    width: StyleSheet.hairlineWidth,
+    backgroundColor: colors.border,
+    marginVertical: spacing.xs,
   },
   stat: {
     flex: 1,

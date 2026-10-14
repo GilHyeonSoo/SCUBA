@@ -1,5 +1,6 @@
 import { meetingCategoryLabels } from '@/src/features/tour/constants';
 import type { MeetingCategory } from '@/src/features/tour/types';
+import { DEFAULT_MAP_CENTER } from '@/src/features/map/constants';
 import type { DiveMeeting, MeetingDraft } from '@/src/features/tour/types';
 
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
@@ -45,6 +46,15 @@ export function formatMeetingCost(cost: number | null): string {
   }
 
   return `₩${cost.toLocaleString('ko-KR')}`;
+}
+
+export function formatTourListingPrice(cost: number | null, priceFrom = true): string {
+  if (cost === null || cost === 0) {
+    return '무료';
+  }
+
+  const suffix = priceFrom ? '~' : '';
+  return `${cost.toLocaleString('ko-KR')}원${suffix}`;
 }
 
 export function formatMeetingParticipants(meeting: DiveMeeting): string {
@@ -156,6 +166,8 @@ export function meetingDraftToMeeting(
     endDate: draft.endDate.trim(),
     time: draft.time.trim(),
     location: draft.location.trim(),
+    latitude: DEFAULT_MAP_CENTER.latitude,
+    longitude: DEFAULT_MAP_CENTER.longitude,
     cost: Number.isFinite(cost) ? cost : null,
     purpose: draft.purpose,
     equipmentRental: draft.equipmentRental,

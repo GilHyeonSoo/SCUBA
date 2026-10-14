@@ -4,6 +4,7 @@ const diveImportFormatLabels: Record<DiveImportFormat, string> = {
   'subsurface-xml': 'Subsurface XML',
   'uddf-xml': 'UDDF XML',
   fit: 'FIT 파일',
+  'mock-ble': '블루투스 시뮬레이션',
 };
 
 export function formatDiveDuration(durationSec: number | null): string {

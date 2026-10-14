@@ -56,5 +56,7 @@ export type DiveMapViewProps = {
   onViewportChange?: (viewport: MapViewport) => void;
   bottomInset?: number;
   initialCenter?: MapCameraTarget;
+  /** When false, map is display-only (no pan/zoom) and does not capture touches. */
+  interactionEnabled?: boolean;
   style?: import('react-native').StyleProp<import('react-native').ViewStyle>;
 };

@@ -11,6 +11,7 @@ import {
   MAPBOX_STYLE_URL,
 } from '@/src/features/map/constants';
 import { MapMarkerPin } from '@/src/features/map/components/MapMarkerPin';
+import { MapMarkerPinWithLabel } from '@/src/features/map/components/MapMarkerPinWithLabel';
 import { ProfileMapMarkerPin } from '@/src/features/map/components/ProfileMapMarkerPin';
 import type {
   DiveMapViewProps,
@@ -85,6 +86,7 @@ export const DiveMapView = forwardRef<DiveMapViewRef, DiveMapViewProps>(function
     onViewportChange,
     bottomInset,
     initialCenter,
+    interactionEnabled = true,
     style,
   },
   ref,
@@ -172,6 +174,7 @@ export const DiveMapView = forwardRef<DiveMapViewRef, DiveMapViewProps>(function
         onMapPress={onMapPress}
         bottomInset={bottomInset}
         initialCenter={initialCenter}
+        interactionEnabled={interactionEnabled}
         style={style}
         message={MAP_API_DISABLED_MESSAGE}
       />
@@ -181,17 +184,33 @@ export const DiveMapView = forwardRef<DiveMapViewRef, DiveMapViewProps>(function
   const defaultCenter = initialCenter ?? DEFAULT_MAP_CENTER;
   const defaultZoom = initialCenter?.zoomLevel ?? DEFAULT_MAP_ZOOM;
 
+  const gestureSettings = interactionEnabled
+    ? MAP_GESTURE_SETTINGS
+    : {
+        panEnabled: false,
+        pinchZoomEnabled: false,
+        pinchPanEnabled: false,
+        rotateEnabled: false,
+        pitchEnabled: false,
+        doubleTapToZoomInEnabled: false,
+        doubleTouchToZoomOutEnabled: false,
+        quickZoomEnabled: false,
+        simultaneousRotateAndPinchZoomEnabled: false,
+      };
+
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[styles.container, style]}
+      pointerEvents={interactionEnabled ? 'auto' : 'none'}>
       <MapView
         style={styles.map}
         styleURL={MAPBOX_STYLE_URL}
         localizeLabels={{ locale: MAPBOX_LABEL_LOCALE }}
-        scrollEnabled
-        zoomEnabled
-        rotateEnabled
+        scrollEnabled={interactionEnabled}
+        zoomEnabled={interactionEnabled}
+        rotateEnabled={interactionEnabled}
         pitchEnabled={false}
-        gestureSettings={MAP_GESTURE_SETTINGS}
+        gestureSettings={gestureSettings}
         compassEnabled={false}
         scaleBarEnabled={false}
         logoEnabled={false}
@@ -251,6 +270,12 @@ export const DiveMapView = forwardRef<DiveMapViewRef, DiveMapViewProps>(function
                 <ProfileMapMarkerPin
                   profileImageUrl={marker.profileImageUrl}
                   isCurrentUser={marker.isCurrentUser}
+                />
+              ) : marker.label ? (
+                <MapMarkerPinWithLabel
+                  tone={marker.tone}
+                  label={marker.label}
+                  selected={selectedMarkerId === marker.id}
                 />
               ) : (
                 <MapMarkerPin

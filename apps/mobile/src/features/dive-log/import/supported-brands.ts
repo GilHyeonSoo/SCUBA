@@ -82,4 +82,5 @@ export const IMPORT_FORMAT_LABELS: Record<
   'subsurface-xml': 'Subsurface XML',
   'uddf-xml': 'UDDF',
   fit: 'FIT',
+  'mock-ble': '블루투스 시뮬레이션',
 };

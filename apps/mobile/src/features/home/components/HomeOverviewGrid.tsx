@@ -79,12 +79,6 @@ export function HomeOverviewGrid({ tiles, defaultFeaturedId }: HomeOverviewGridP
 
   return (
     <View style={styles.panel}>
-      <View style={styles.featuredHeader}>
-        <AppText variant="label" style={styles.featuredHeaderLabel}>
-          {featuredTile.label}
-        </AppText>
-      </View>
-
       <Pressable
         accessibilityRole="button"
         disabled={!featuredTile.onPress}
@@ -93,24 +87,29 @@ export function HomeOverviewGrid({ tiles, defaultFeaturedId }: HomeOverviewGridP
           styles.featuredTile,
           pressed && featuredTile.onPress && styles.featuredTilePressed,
         ]}>
-        <HomeOverviewFeaturedContent panel={featuredTile.panel} />
+        <HomeOverviewFeaturedContent
+          panel={featuredTile.panel}
+          sectionLabel={featuredTile.label}
+        />
       </Pressable>
 
-      <View style={styles.compactRow}>
-        {secondaryTiles.map((tile) => (
-          <Pressable
-            key={tile.id}
-            accessibilityRole="button"
-            accessibilityLabel={`${tile.label} 메인으로 보기`}
-            onPress={() => setFeaturedId(tile.id)}
-            style={({ pressed }) => [
-              styles.compactTile,
-              pressed && styles.compactTilePressed,
-            ]}>
-            <CompactTileContent tile={tile} />
-          </Pressable>
-        ))}
-      </View>
+      {secondaryTiles.length > 0 ? (
+        <View style={styles.compactRow}>
+          {secondaryTiles.map((tile) => (
+            <Pressable
+              key={tile.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${tile.label} 메인으로 보기`}
+              onPress={() => setFeaturedId(tile.id)}
+              style={({ pressed }) => [
+                styles.compactTile,
+                pressed && styles.compactTilePressed,
+              ]}>
+              <CompactTileContent tile={tile} />
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -118,27 +117,11 @@ export function HomeOverviewGrid({ tiles, defaultFeaturedId }: HomeOverviewGridP
 const styles = StyleSheet.create({
   panel: {
     backgroundColor: colors.background,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-  },
-  featuredHeader: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.divider,
-  },
-  featuredHeaderLabel: {
-    color: colors.primary,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
   },
   featuredTile: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.divider,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.lg,
     minHeight: 220,
   },
   featuredTilePressed: {

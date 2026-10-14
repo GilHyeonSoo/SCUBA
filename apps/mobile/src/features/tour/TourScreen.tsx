@@ -183,7 +183,8 @@ const styles = StyleSheet.create({
     borderTopColor: colors.divider,
   },
   tourList: {
-    gap: spacing.xl,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.divider,
   },
   educationList: {
     gap: spacing.lg,

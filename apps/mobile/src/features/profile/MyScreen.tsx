@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
@@ -19,6 +20,8 @@ import { getProfileDisciplineLines } from '@/src/features/profile/utils';
 import { CURRENT_USER_ID } from '@/src/features/social/constants';
 import { useMyFollowStatsRemote } from '@/src/features/social/hooks/useFollowRemote';
 import { useFollowStore } from '@/src/features/social/stores/follow-store';
+
+const MY_ACTION_ICON_SIZE = 22;
 
 export default function MyScreen() {
   const router = useRouter();
@@ -64,6 +67,10 @@ export default function MyScreen() {
 
   const openGear = useCallback(() => {
     router.push('/(tabs)/my/gear');
+  }, [router]);
+
+  const openLog = useCallback(() => {
+    router.push('/(tabs)/dive');
   }, [router]);
 
   const openSettings = useCallback(() => {
@@ -154,9 +161,15 @@ export default function MyScreen() {
           accessibilityLabel="내 장비"
           onPress={openGear}
           style={({ pressed }) => [styles.iconAction, pressed && styles.iconActionPressed]}>
-          <AppText variant="label" style={styles.iconLabel}>
-            장비
-          </AppText>
+          <Ionicons name="cube-outline" size={MY_ACTION_ICON_SIZE} color={colors.textPrimary} />
+        </Pressable>
+        <View style={styles.iconBarDivider} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="다이브 로그"
+          onPress={openLog}
+          style={({ pressed }) => [styles.iconAction, pressed && styles.iconActionPressed]}>
+          <Ionicons name="reader-outline" size={MY_ACTION_ICON_SIZE} color={colors.textPrimary} />
         </Pressable>
         <View style={styles.iconBarDivider} />
         <Pressable
@@ -164,9 +177,7 @@ export default function MyScreen() {
           accessibilityLabel="설정"
           onPress={openSettings}
           style={({ pressed }) => [styles.iconAction, pressed && styles.iconActionPressed]}>
-          <AppText variant="label" style={styles.iconLabel}>
-            설정
-          </AppText>
+          <Ionicons name="settings-outline" size={MY_ACTION_ICON_SIZE} color={colors.textPrimary} />
         </Pressable>
       </View>
 
@@ -197,7 +208,7 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     paddingHorizontal: layout.screenPaddingHorizontal,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.sm,
     gap: spacing.md,
   },
   profileSectionPressed: {
@@ -244,10 +255,6 @@ const styles = StyleSheet.create({
   },
   iconActionPressed: {
     opacity: 0.6,
-  },
-  iconLabel: {
-    color: colors.textPrimary,
-    fontSize: 14,
   },
   iconBarDivider: {
     width: StyleSheet.hairlineWidth,

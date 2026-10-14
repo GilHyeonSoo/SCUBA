@@ -21,6 +21,11 @@ export const meetingMockImages = {
     poolEducation: buildCoverUri('1583212292454-1fe6229603b7'),
     seaExperienceTour: buildCoverUri('1544551763-46a013bb70d5'),
     poolTraining: buildCoverUri('1682687220063-4742bd7fd538'),
+    jejuBoatTour: buildCoverUri('1559827260-dc66d52bef19'),
+    philippinesReef: buildCoverUri('1682687220797-810e8d7902aa'),
+    eastCoastWreck: buildCoverUri('1519452571012-f5f7fd42b89d'),
+    maldivesLiveaboard: buildCoverUri('1544551763-77a03631423d'),
+    kohTaoTrip: buildCoverUri('1583212292454-1fe6229603b7'),
   },
   avatars: {
     diverKim: buildAvatarUri('1535713875002-d1d0cf377fde'),
@@ -29,5 +34,8 @@ export const meetingMockImages = {
     waveRunner: buildAvatarUri('1494790108377-be9c29b29330'),
     yeosuMarineDive: buildAvatarUri('1560250097-0b93528c311a'),
     diveCoach: buildAvatarUri('1580489944761-15a19d654956'),
+    jejuDiveOps: buildAvatarUri('1527980965255-d3b416303d12'),
+    reefExpedition: buildAvatarUri('1573496359142-b8d87734a5a2'),
+    liveaboardCaptain: buildAvatarUri('1519081908940-4ccb6260a393'),
   },
 } as const;

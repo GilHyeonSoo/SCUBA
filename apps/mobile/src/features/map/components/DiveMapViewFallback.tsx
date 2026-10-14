@@ -13,6 +13,7 @@ import {
 import { AppText } from '@/src/components/ui';
 import { colors, radius, spacing } from '@/src/constants';
 import { MapMarkerPin } from '@/src/features/map/components/MapMarkerPin';
+import { MapMarkerPinWithLabel } from '@/src/features/map/components/MapMarkerPinWithLabel';
 import { ProfileMapMarkerPin } from '@/src/features/map/components/ProfileMapMarkerPin';
 import { EXPLORE_DEFAULT_ZOOM } from '@/src/features/explore/constants';
 import type { DiveMapViewProps, DiveMapViewRef, MapViewport } from '@/src/features/map/types';
@@ -34,6 +35,7 @@ export const DiveMapViewFallback = forwardRef<DiveMapViewRef, DiveMapViewFallbac
       onViewportChange,
       bottomInset = spacing.lg,
       initialCenter,
+      interactionEnabled = true,
       style,
       message = '드래그하여 지도 이동',
     },
@@ -123,7 +125,7 @@ export const DiveMapViewFallback = forwardRef<DiveMapViewRef, DiveMapViewFallbac
     );
 
     useEffect(() => {
-      if (Platform.OS !== 'web') {
+      if (!interactionEnabled || Platform.OS !== 'web') {
         return;
       }
 
@@ -156,11 +158,12 @@ export const DiveMapViewFallback = forwardRef<DiveMapViewRef, DiveMapViewFallbac
       return () => {
         node.removeEventListener('wheel', handleWheel);
       };
-    }, [onMapMove, pan, scale]);
+    }, [interactionEnabled, onMapMove, pan, scale]);
 
     const panResponder = useMemo(
       () =>
-        PanResponder.create({
+        interactionEnabled
+          ? PanResponder.create({
           onMoveShouldSetPanResponder: () => true,
           onPanResponderGrant: () => {
             lastGesture.current = { x: 0, y: 0 };
@@ -187,15 +190,17 @@ export const DiveMapViewFallback = forwardRef<DiveMapViewRef, DiveMapViewFallbac
             lastGesture.current = { x: 0, y: 0 };
           },
           onPanResponderTerminationRequest: () => false,
-        }),
-      [onMapMove, onMapMoveEnd, pan],
+        })
+          : PanResponder.create({}),
+      [interactionEnabled, onMapMove, onMapMoveEnd, pan],
     );
 
     return (
       <View
         ref={containerRef}
         style={[styles.container, style]}
-        {...panResponder.panHandlers}>
+        pointerEvents={interactionEnabled ? 'auto' : 'none'}
+        {...(interactionEnabled ? panResponder.panHandlers : {})}>
         <Animated.View
           style={[
             styles.mapLayer,
@@ -232,28 +237,31 @@ export const DiveMapViewFallback = forwardRef<DiveMapViewRef, DiveMapViewFallbac
                     profileImageUrl={marker.profileImageUrl}
                     isCurrentUser={marker.isCurrentUser}
                   />
+                ) : marker.label ? (
+                  <MapMarkerPinWithLabel
+                    tone={marker.tone}
+                    label={marker.label}
+                    selected={selectedMarkerId === marker.id}
+                  />
                 ) : (
                   <MapMarkerPin
                     tone={marker.tone}
                     selected={selectedMarkerId === marker.id}
                   />
                 )}
-                <View style={styles.markerLabel}>
-                  <AppText variant="caption" style={styles.markerLabelText}>
-                    {marker.label}
-                  </AppText>
-                </View>
               </Pressable>
             );
           })}
         </Animated.View>
 
-        <View style={[styles.mapBadge, { bottom: bottomInset }]} pointerEvents="none">
-          <Ionicons name="map-outline" size={14} color={colors.primaryStrong} />
-          <AppText variant="caption" style={styles.mapBadgeText}>
-            {message}
-          </AppText>
-        </View>
+        {interactionEnabled && message ? (
+          <View style={[styles.mapBadge, { bottom: bottomInset }]} pointerEvents="none">
+            <Ionicons name="map-outline" size={14} color={colors.primaryStrong} />
+            <AppText variant="caption" style={styles.mapBadgeText}>
+              {message}
+            </AppText>
+          </View>
+        ) : null}
       </View>
     );
   },

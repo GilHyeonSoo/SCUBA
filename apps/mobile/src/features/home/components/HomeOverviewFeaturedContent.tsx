@@ -8,6 +8,7 @@ import type { HomeOverviewPanel } from '@/src/features/home/types/home-overview'
 
 type HomeOverviewFeaturedContentProps = {
   panel: HomeOverviewPanel;
+  sectionLabel?: string;
 };
 
 function StatCell({ label, value }: { label: string; value: string }) {
@@ -23,16 +24,26 @@ function StatCell({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function HomeOverviewFeaturedContent({ panel }: HomeOverviewFeaturedContentProps) {
+export function HomeOverviewFeaturedContent({
+  panel,
+  sectionLabel,
+}: HomeOverviewFeaturedContentProps) {
   if (panel.type === 'recent') {
     const hasProfile = canRenderProfile(panel.profile);
 
     return (
       <View style={styles.panelBody}>
         <View style={styles.panelHeader}>
-          <AppText variant="sectionTitle" style={styles.panelTitle}>
-            {panel.site}
-          </AppText>
+          <View style={styles.panelTitleRow}>
+            <AppText variant="sectionTitle" style={styles.panelTitle} numberOfLines={1}>
+              {panel.site}
+            </AppText>
+            {sectionLabel ? (
+              <AppText variant="label" style={styles.sectionLabel}>
+                {sectionLabel}
+              </AppText>
+            ) : null}
+          </View>
           <AppText variant="body" style={styles.panelSubtitle}>
             {panel.date}
           </AppText>
@@ -167,9 +178,21 @@ const styles = StyleSheet.create({
   panelHeader: {
     gap: spacing.xs,
   },
+  panelTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
   panelTitle: {
+    flex: 1,
     color: colors.textPrimary,
     letterSpacing: -0.4,
+  },
+  sectionLabel: {
+    flexShrink: 0,
+    color: colors.primary,
+    fontWeight: '700',
   },
   panelSubtitle: {
     color: colors.textSecondary,

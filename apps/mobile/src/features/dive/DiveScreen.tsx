@@ -11,11 +11,11 @@ import {
 } from '@/src/components/ui/CollapsibleActionFab';
 import { AppText } from '@/src/components/ui';
 import { colors, getTabBarChromeHeight, spacing } from '@/src/constants';
+import { DiveComputerConnectFlow } from '@/src/features/dive-computer/components/DiveComputerConnectFlow';
 import { DiveImportSheet } from '@/src/features/dive-log/components/DiveImportSheet';
 import { useDiveImport } from '@/src/features/dive-log/hooks/useDiveImport';
 import { useDiveLogStore } from '@/src/features/dive-log/stores/dive-log-store';
 import { DiveAddOptionsFabPanel } from '@/src/features/dive/components/DiveAddOptionsFabPanel';
-import { DiveBluetoothConnectModal } from '@/src/features/dive/components/DiveBluetoothConnectModal';
 import { DiveLatestSection } from '@/src/features/dive/components/DiveLatestSection';
 import { DiveLedgerEmptyState } from '@/src/features/dive/components/DiveLedgerEmptyState';
 import { DivePreviousLogItem } from '@/src/features/dive/components/DivePreviousLogItem';
@@ -37,7 +37,7 @@ export default function DiveScreen() {
     useDiveImport();
 
   const [addOptionsExpanded, setAddOptionsExpanded] = useState(false);
-  const [bluetoothModalVisible, setBluetoothModalVisible] = useState(false);
+  const [connectFlowVisible, setConnectFlowVisible] = useState(false);
 
   const currentYear = new Date().getFullYear();
   const availableYears = useMemo(() => getAvailableYears(dives, currentYear), [dives, currentYear]);
@@ -74,7 +74,7 @@ export default function DiveScreen() {
 
   const handleBluetoothPress = useCallback(() => {
     collapseAddOptions();
-    setBluetoothModalVisible(true);
+    setConnectFlowVisible(true);
   }, [collapseAddOptions]);
 
   const handleImportPress = useCallback(() => {
@@ -172,9 +172,9 @@ export default function DiveScreen() {
         onPickFile={(format) => void pickAndImport(format)}
       />
 
-      <DiveBluetoothConnectModal
-        visible={bluetoothModalVisible}
-        onClose={() => setBluetoothModalVisible(false)}
+      <DiveComputerConnectFlow
+        visible={connectFlowVisible}
+        onClose={() => setConnectFlowVisible(false)}
       />
     </View>
   );

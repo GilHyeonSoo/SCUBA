@@ -53,6 +53,43 @@ export type HomeAdBanner = {
   gradient: readonly [string, string, ...string[]];
 };
 
+export type HomeKDivingPulseSpot = {
+  id: string;
+  name: string;
+  region: string;
+  visibilityLabel: string;
+  waterTempC: number;
+  note: string;
+};
+
+export type HomeSeaPulse = {
+  region: string;
+  periodLabel: string;
+  logCount7d: number;
+  visibilityLabel: string;
+  avgTempC: number;
+};
+
+export type HomeOnThisDayMemory = {
+  id: string;
+  yearsAgo: number;
+  date: string;
+  site: string;
+  durationMin: number;
+  maxDepthM: number;
+  buddy?: string;
+};
+
+export type HomeBlueTrajectory = {
+  newSitesThisYear: number;
+  underwaterHours: number;
+  seasonStamp: {
+    label: string;
+    completed: number;
+    total: number;
+  };
+};
+
 export const mockHomeData = {
   region: '서울',
   country: '대한민국',
@@ -106,6 +143,50 @@ export const mockHomeData = {
     maxDepth: 18,
     duration: 42,
   },
+  kDivingPulse: [
+    {
+      id: 'spot1',
+      name: '아야진',
+      region: '강원 고성 · 동해',
+      visibilityLabel: '12–15m',
+      waterTempC: 21,
+      note: '오전 입수가 잔잔하고 시야가 깔끔해요.',
+    },
+    {
+      id: 'spot2',
+      name: '딥스테이션',
+      region: '경기 용인 · 실내',
+      visibilityLabel: '맑음',
+      waterTempC: 29,
+      note: '수심 훈련과 장비 체크를 함께 하기 좋아요.',
+    },
+  ] as HomeKDivingPulseSpot[],
+  seaPulse: {
+    region: '속초',
+    periodLabel: '최근 7일',
+    logCount7d: 38,
+    visibilityLabel: '좋음',
+    avgTempC: 21.4,
+  } as HomeSeaPulse,
+  logInsight: '지난 5회보다 평균 다이브 시간이 6분 길었어요.',
+  onThisDay: {
+    id: 'memory1',
+    yearsAgo: 1,
+    date: '2025년 9월 21일',
+    site: '제주 문섬 한개창',
+    durationMin: 51,
+    maxDepthM: 24.6,
+    buddy: 'Diver Kim',
+  } as HomeOnThisDayMemory,
+  blueTrajectory: {
+    newSitesThisYear: 7,
+    underwaterHours: 18.6,
+    seasonStamp: {
+      label: '가을 동해',
+      completed: 2,
+      total: 4,
+    },
+  } as HomeBlueTrajectory,
   adBanners: [
     {
       id: 'ad1',

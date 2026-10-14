@@ -33,7 +33,7 @@ export function DiveImportSheet({
           <View style={styles.handle} />
           <AppText variant="h2">다이빙 로그 가져오기</AppText>
           <AppText variant="bodySmall" style={styles.subtitle}>
-            브랜드별로 export한 파일을 SCUBA로 불러옵니다. BLE 직접 연결은 다음 단계에서 제공됩니다.
+            브랜드별로 export한 파일을 SCUBA로 불러옵니다. 블루투스 연동은 현재 시뮬레이션으로 제공됩니다.
           </AppText>
 
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>

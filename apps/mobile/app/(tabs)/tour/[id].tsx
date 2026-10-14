@@ -1,1 +1,1 @@
-export { default } from '@/src/features/tour/MeetingDetailScreen';
+export { default } from '@/src/features/tour/MeetingDetailRoute';

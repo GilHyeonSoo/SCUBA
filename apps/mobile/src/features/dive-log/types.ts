@@ -9,7 +9,7 @@ export type DiveGas = {
   description: string | null;
 };
 
-export type DiveImportFormat = 'subsurface-xml' | 'uddf-xml' | 'fit';
+export type DiveImportFormat = 'subsurface-xml' | 'uddf-xml' | 'fit' | 'mock-ble';
 
 export type DiveSource = {
   format: DiveImportFormat;

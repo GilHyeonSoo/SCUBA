@@ -10,7 +10,7 @@ import type { DiveMeeting } from '@/src/features/tour/types';
 type MeetingCoverImageProps = {
   meeting: DiveMeeting;
   edgeToEdge?: boolean;
-  variant?: 'featured' | 'thumbnail' | 'hero';
+  variant?: 'featured' | 'thumbnail' | 'listPortrait' | 'hero';
 };
 
 const environmentIcons = {
@@ -29,16 +29,19 @@ export function MeetingCoverImage({
   variant = 'featured',
 }: MeetingCoverImageProps) {
   const isThumbnail = variant === 'thumbnail';
+  const isListPortrait = variant === 'listPortrait';
   const isHero = variant === 'hero';
   const imageStyle = [
     styles.image,
     isThumbnail && styles.imageThumbnail,
+    isListPortrait && styles.imageListPortrait,
     isHero && styles.imageHero,
     edgeToEdge && styles.imageEdgeToEdge,
   ];
   const placeholderStyle = [
     styles.placeholder,
     isThumbnail && styles.imageThumbnail,
+    isListPortrait && styles.imageListPortrait,
     isHero && styles.imageHero,
     edgeToEdge && styles.imageEdgeToEdge,
   ];
@@ -61,10 +64,10 @@ export function MeetingCoverImage({
     <LinearGradient colors={[...gradientColors]} style={placeholderStyle}>
       <Ionicons
         name={iconName}
-        size={isThumbnail ? 22 : isHero ? 48 : 36}
+        size={isThumbnail || isListPortrait ? 22 : isHero ? 48 : 36}
         color={colors.white}
       />
-      {!isThumbnail && !isHero ? (
+      {!isThumbnail && !isListPortrait && !isHero ? (
         <AppText variant="caption" style={styles.placeholderLabel}>
           {meetingCategoryLabels[meeting.category]}
         </AppText>
@@ -84,6 +87,11 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: radius.md,
+  },
+  imageListPortrait: {
+    width: 96,
+    height: 120,
+    borderRadius: radius.lg,
   },
   imageHero: {
     width: '100%',

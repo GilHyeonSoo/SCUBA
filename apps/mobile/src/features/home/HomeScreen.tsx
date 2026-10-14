@@ -9,10 +9,10 @@ import { AppHeader, AppText } from '@/src/components/ui';
 import { colors, layout, spacing } from '@/src/constants';
 import { HomeAdCarousel } from '@/src/features/home/components/HomeAdCarousel';
 import { HomeExpeditionRibbon } from '@/src/features/home/components/HomeExpeditionRibbon';
+import { HomeLogInsightCard } from '@/src/features/home/components/HomeLogInsightCard';
 import { HomeNextExpeditionCard } from '@/src/features/home/components/HomeNextExpeditionCard';
+import { HomeOnThisDaySection } from '@/src/features/home/components/HomeOnThisDaySection';
 import { HomeOverviewGrid } from '@/src/features/home/components/HomeOverviewGrid';
-import { HomeSectionHeader } from '@/src/features/home/components/HomeSectionHeader';
-import { HomeUpcomingTourCard } from '@/src/features/home/components/HomeUpcomingTourCard';
 import { mockHomeData } from '@/src/features/home/mock-data';
 import { createMockDiveProfile } from '@/src/features/home/utils/mock-dive-profile';
 import { useProfileStore } from '@/src/features/profile/stores/profile-store';
@@ -23,12 +23,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const profile = useProfileStore((state) => state.profile);
   const greeting = formatProfileGreeting(profile.displayName);
-
-  const maintenance = data.maintenance[0];
-  const buddyCount = data.nearbyBuddies.length;
-  const tourSeatParts = data.upcomingTour.participants.replace(/명/g, '').split('/');
-  const tourFilledSeats = Number.parseInt(tourSeatParts[0] ?? '0', 10);
-  const tourTotalSeats = Number.parseInt(tourSeatParts[1] ?? '0', 10);
 
   const recentProfile = useMemo(
     () => createMockDiveProfile(data.recentDive.maxDepth, data.recentDive.duration),
@@ -85,31 +79,19 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)/dive')}
               onCtaPress={handlePreDiveChecklist}
             />
-            <HomeUpcomingTourCard
-              title={data.upcomingTour.title}
-              location={data.upcomingTour.location}
-              date={data.upcomingTour.date}
-              participants={data.upcomingTour.participants}
-              isOfficial={data.upcomingTour.type === 'official'}
-              stacked
-              onPress={() => router.push('/(tabs)/tour')}
-            />
           </View>
         </View>
       </FadeInView>
 
       <FadeInView index={2}>
-        <HomeSectionHeader title="Overview" marginTop={spacing['3xl']} />
-        <View style={styles.fullBleed}>
+        <View style={[styles.fullBleed, styles.overviewSection]}>
           <HomeOverviewGrid
-            defaultFeaturedId="recent-log"
             tiles={[
               {
                 id: 'recent-log',
-                label: 'Recent',
+                label: '최근 다이빙',
                 value: String(data.recentDive.maxDepth),
                 valueUnit: 'm',
-                hint: data.recentDive.site,
                 panel: {
                   type: 'recent',
                   site: data.recentDive.site,
@@ -121,46 +103,25 @@ export default function HomeScreen() {
                 },
                 onPress: () => router.push('/(tabs)/dive'),
               },
-              {
-                id: 'buddy',
-                label: 'Buddy',
-                value: String(buddyCount),
-                valueUnit: '명',
-                hint: data.nearbyBuddies[0]?.nickname,
-                panel: {
-                  type: 'buddy',
-                  count: buddyCount,
-                  buddies: data.nearbyBuddies,
-                },
-                onPress: () => router.push('/(tabs)/buddy'),
-              },
-              {
-                id: 'gear',
-                label: 'Gear',
-                value: maintenance ? '1' : '0',
-                valueUnit: '건',
-                hint: maintenance?.equipmentName ?? '점검 항목 없음',
-                panel: {
-                  type: 'gear',
-                  maintenance: maintenance ?? null,
-                },
-                onPress: () => router.push('/(tabs)/my/gear'),
-              },
-              {
-                id: 'tour',
-                label: 'Tour',
-                value: String(tourFilledSeats),
-                valueUnit: '석',
-                hint: data.upcomingTour.title,
-                panel: {
-                  type: 'tour',
-                  tour: data.upcomingTour,
-                  filledSeats: tourFilledSeats,
-                  totalSeats: tourTotalSeats,
-                },
-                onPress: () => router.push('/(tabs)/tour'),
-              },
             ]}
+          />
+        </View>
+      </FadeInView>
+
+      <FadeInView index={3}>
+        <View style={[styles.fullBleed, styles.insightSection]}>
+          <HomeLogInsightCard
+            insight={data.logInsight}
+            onPress={() => router.push('/(tabs)/dive')}
+          />
+        </View>
+      </FadeInView>
+
+      <FadeInView index={4}>
+        <View style={[styles.fullBleed, styles.memorySection]}>
+          <HomeOnThisDaySection
+            memory={data.onThisDay}
+            onPress={() => router.push('/(tabs)/dive')}
           />
         </View>
       </FadeInView>
@@ -180,6 +141,16 @@ const styles = StyleSheet.create({
   },
   nextDiveStack: {
     gap: 0,
+  },
+  overviewSection: {
+    marginTop: spacing.xs,
+  },
+  insightSection: {
+    marginTop: spacing.sm,
+  },
+  memorySection: {
+    marginTop: spacing.md,
+    paddingBottom: spacing.xl,
   },
   greetingRow: {
     flexDirection: 'row',
